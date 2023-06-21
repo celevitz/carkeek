@@ -13,21 +13,7 @@ font_add_google("Roboto Mono")
 
 states_map <- map_data("state")
 
-latlong <- data.frame(rbind(
-  c(1, "Pipers",47.711661, -122.379126),
-  c(2, "Molendorph",47.711820, -122.370965),
-  c(3, "Venema",47.711451, -122.370642),
-  c(4,"North Creek", 47.709538, -122.366411),
-  c(5,"Viewlands", 47.706920, -122.364522),
-  c(6,"Pipers", 47.705040, -122.364296),
-  c(7, "Pipers",47.704931, -122.363795),
-  c(8, "Trib M",47.703975, -122.363343))) %>%
-  rename(sitenumber=X1
-         ,waterBody = X2
-         ,latitude=X3
-         ,longitude = X4) %>%
-  mutate(region = "washington",
-         temp = sitenumber)
+## This code doesn't work.
 
 latlong %>%
   ggplot() +
