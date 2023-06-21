@@ -65,6 +65,13 @@ tempsubtitle <- str_glue("Water temperature can affect the breeding and feeding
                          water temperature. The National Wildlife<br>Federation
                          says that the optimum water temperature<br>range for
                          chinook salmon is 12.8 to 17.8 degrees Celsius.")
+phtitle <- "pH over time"
+phsubtitle <- str_glue("pH measures how acidic or basic water is. A value of 7
+                        is neutral.<br>Less than 7 is acidic, and more than 7 is
+                        basic. pH can change<br>over the course of a season (or a
+                        day). A pH less than 4.0<br>or more than 11.0 is usually
+                       lethal to fish and other organisms.<br>pH between 6 and 8.5
+                       is usually ideal.")
 
 sitespecificdata <- clean %>% filter(`Site.#` == sitechosen)
 
@@ -87,7 +94,7 @@ temperature <-
             ,aes(x=Date.Tested+1,y=Air.Temp),color=mid2
             ,label="Air temperature",hjust=0,size=textlabelsize) +
   scale_y_continuous(lim=c(0,27)) +
-  xlab("Date") + ylab("Temperature (Celsius)") +
+  ylab("Temperature (Celsius)") +
   labs(title=temptitle
        ,subtitle=tempsubtitle) +
   theme_minimal() +
@@ -95,10 +102,43 @@ temperature <-
         ,panel.background = element_blank()
         ,plot.background = element_blank()
         ,axis.text = element_markdown()
+        ,axis.line.y = element_line(color=dark)
+        ,axis.ticks.y = element_line(color=dark)
+        ,axis.title.x = element_blank()
         ,plot.title = element_markdown(size=titlesize,face="bold",margin=margin(t=titlemarginT,r=titlemarginR,b=titlemarginB,l=titlemarginL))
         ,plot.subtitle = element_markdown(size=subtitlesize)
         ,plot.caption = element_markdown(size=captionsize)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB,l=plotmarginL))
+
+phGraph <-
+  sitespecificdata %>%
+    ggplot(aes(x=Date.Tested,y=pH)) +
+    coord_cartesian(clip="off") +
+    geom_rect(xmin=min(sitespecificdata$Date.Tested)
+              ,xmax=max(sitespecificdata$Date.Tested)
+              ,ymin=6,ymax=8.5
+              ,color=light,fill=light)+
+    geom_point(aes(x=Date.Tested,y=pH),color=main) +
+    geom_line(aes(x=Date.Tested,y=pH),color=main) +
+    geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
+              ,aes(x=Date.Tested+1,y=pH),color=main
+              ,label="pH",hjust=0,size=textlabelsize) +
+    scale_y_continuous(lim=c(0,14),breaks=seq(0,14,1),labels=seq(0,14,1)) +
+    ylab("pH") +
+    labs(title=phtitle
+         ,subtitle=phsubtitle) +
+    theme_minimal() +
+    theme(panel.grid = element_blank()
+          ,panel.background = element_blank()
+          ,plot.background = element_blank()
+          ,axis.text = element_markdown()
+          ,axis.title.x = element_blank()
+          ,axis.line.y = element_line(color=dark)
+          ,axis.ticks.y = element_line(color=dark)
+          ,plot.title = element_markdown(size=titlesize,face="bold",margin=margin(t=titlemarginT,r=titlemarginR,b=titlemarginB,l=titlemarginL))
+          ,plot.subtitle = element_markdown(size=subtitlesize)
+          ,plot.caption = element_markdown(size=captionsize)
+          ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB,l=plotmarginL))
 
 
 
@@ -106,9 +146,9 @@ temperature <-
 
 pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
     ,paper="letter",width=8,height=11)
-ggarrange(temperature,temperature
-          ,temperature,temperature
-          ,temperature,temperature
+ggarrange(temperature,phGraph
+          ,temperature,phGraph
+          ,temperature,phGraph
           ,nrow=3,ncol=2)
 
 dev.off()
