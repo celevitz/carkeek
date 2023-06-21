@@ -1,7 +1,9 @@
-## Carly Levitz
+## Author: Carly Levitz
 ## Written: 2023-06-20
 ## Purpose: create visualizations of Carkeek Watershed data
 
+
+## Step 1: set things up
 rm(list=ls())
 
 library(ggplot2)
@@ -42,9 +44,11 @@ titlemarginB <- 10
 
 logo <- paste(directory,"CWCAPlogo-1-white-1024x346.png",sep="")
 
+## Step 2: Bring in data and clean it
+### Bring in data
 rawdata <- as_tibble(read.xlsx(paste(directory,"H20 Data as of May 2024.xlsx",sep=""),sheet=1,startRow = 2))
 
-# Clean data
+### Clean data
 clean <- rawdata %>%
   # I'll need to fix the date and time
   # remove trailing spaces, extra quotation marks
@@ -61,8 +65,11 @@ clean <- rawdata %>%
   }
 
 
+## Step 3: set up things for visualizations
+## For now, just do it for site 1.
 
 sitechosen <- 1
+
 ## The idea is: for each site, have the logo and a general description at the
 ## top. Then, 6 graphs - overall statement, temperature, ph, total hardness &
 ## total alkalinity, dissolved oxygen, and turbidity.
@@ -76,7 +83,12 @@ numberofvolunteers <- length(unique(c(unique(sitespecificdata$`Tester.#1`)
                                       ,unique(sitespecificdata$`Tester.#2`))))
 overalltitle <- str_glue("{nameofsite} (Site #{sitechosen}) has been tested
                         {numberoftests} times by {numberofvolunteers}
-                         volunteers.")
+                         volunteers.<br><br>Thank you for your time!")
+overallsubtitle <- str_glue("If you are interested in volunteering, have
+                            questions, or would like<br>to donate: email
+                            info at CarkeekWatershed.org")
+overallcaption <- str_glue("Analyzed by Carly Levitz and supported by
+                           Troy Beckner")
 
 temptitle <- str_glue("Water and air temperature")
 tempsubtitle <- str_glue("Water temperature can affect the breeding and feeding
@@ -104,9 +116,9 @@ hAndASubtitle <- str_glue("Higher alkalinity provides a buffer against changes
                           the concentration<br>
                           of calcium and magnesium ions in water.")
 
-info <- data.frame(x = 1,
-                y = 1,
-                image = logo)
+# create a placeholder dataframe for the logo so we can use it firstgraphB
+info <- data.frame(x = 1,y = 1,image = logo)
+
 firstgraphA <-
   ggplot(info, aes(x=x,y=y)) +
   geom_image(aes(x=1,y=1,image=logo),size=2.2) +
@@ -130,7 +142,9 @@ firstgraphA <-
 
 firstgraphB <-
   ggplot(info,aes(x=x,y=y)) +
-  labs(title=overalltitle) +
+  labs(title=overalltitle
+       ,subtitle=overallsubtitle
+       ,caption=overallcaption) +
   theme_minimal() +
   theme(panel.grid = element_blank()
         ,panel.background = element_blank()
@@ -145,8 +159,9 @@ firstgraphB <-
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL)
                                        ,hjust=.5,color=main)
-        ,plot.subtitle = element_markdown(size=subtitlesize)
-        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.subtitle = element_markdown(size=subtitlesize
+                                          ,hjust=.5,color=mid2)
+        ,plot.caption = element_markdown(size=captionsize,color=mid2)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
@@ -247,13 +262,16 @@ hAndAGraph <-   sitespecificdata %>%
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB,l=plotmarginL))
 
 
-
+## Step 4: loop through the sites and print the PDFs
+## for now, just doing it for site #1
 
 
 pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
     ,paper="letter",width=8,height=11)
+
 ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
           ,phGraph,hAndAGraph
+          # when I've created the final graphs, I'll update these two things
           ,phGraph,hAndAGraph
           ,nrow=3,ncol=2)
 
