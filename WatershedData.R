@@ -32,7 +32,7 @@ axistitlesize <- 20
 axissize <- 18
 titlesize <- 10
 subtitlesize <- 8
-captionsize <- 8
+captionsize <- 5
 textlabelsize <- 2
 plotmarginL <- 10
 plotmarginR <- 30
