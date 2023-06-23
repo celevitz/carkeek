@@ -35,7 +35,7 @@ subtitlesize <- 8
 captionsize <- 5
 textlabelsize <- 2
 plotmarginL <- 10
-plotmarginR <- 30
+plotmarginR <- 40
 plotmarginT <- 10
 plotmarginB <- 10
 titlemarginL <- 10
