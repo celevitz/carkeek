@@ -1,5 +1,6 @@
 ## Author: Carly Levitz
 ## Written: 2023-06-20
+## Updated: 2023-06-23
 ## Purpose: create visualizations of Carkeek Watershed data
 
 
@@ -45,18 +46,47 @@ titlemarginB <- 10
 logo <- paste(directory,"CWCAPlogo-1-white-1024x346.png",sep="")
 
 ## Step 2: Bring in data and clean it
-### Bring in data
-rawdata <- as_tibble(read.xlsx(paste(directory,"H20 Data as of May 2024.xlsx",sep=""),sheet=1,startRow = 2))
+### Step 2a. Bring in data
+rawdata <- as_tibble(read.xlsx(paste(directory,"H20 Data as of May 2024.xlsx"
+                                     ,sep=""),sheet=1,startRow = 2))
 
-### Clean data
+### Step 2b. Clean data
 clean <- rawdata %>%
-  # I'll need to fix the date and time
+  # Fix date error: 12/13/2020 should be 12/13/2022
+  mutate(Date.Tested = ifelse(Date.Tested == 44178 & !(is.na(Date.Tested))
+                              ,44908,Date.Tested)
+  # Fix the date and time
+        ,Date.Tested = as.Date(as.numeric(Date.Tested), origin = "1899-12-30")
   # remove trailing spaces, extra quotation marks
+        ,`Tester.#1` = trimws(gsub("\\\"","",`Tester.#1`),"both")
+        ,`Tester.#2` = trimws(gsub("\\\"","",`Tester.#2`),"both")
   # combine testers that are the same
+        ,`Tester.#1` = case_when(`Tester.#1` %in% c("Sue") ~ "Sue Cottrell"
+                                 ,`Tester.#1` %in% c("Natale") ~ "Natalie"
+                                 ,`Tester.#1` %in% c("mike") ~ "Mike"
+                                 ,`Tester.#1` %in% c("sean") ~ "Sean"
+                                 ,TRUE ~ `Tester.#1`)
+         ,`Tester.#2` = case_when(`Tester.#2` %in% c("Alice") ~
+                                                        "Alice Cottrell-Steen"
+                                  ,`Tester.#2` %in% c("-  ","-") ~ NA
+                                  ,TRUE ~ `Tester.#2`)
+  # If Turbidity is greater than 240, plot it at 241
+        ,`Turbidity.(JTU)` = ifelse(">240 NCU","241",`Turbidity.(JTU)`)
+  # If Coliform is too numerous to count (TNTC), plot it at 350
+        ,Coliform.1 = case_when(Coliform.1 %in% c("TNTC","TNTC ")~"350"
+                                ,Coliform.1 %in% c("-","n/a") ~NA
+                                ,TRUE ~ Coliform.1)
+        ,Coliform.2 = case_when(Coliform.2 %in% c("TNTC","TNTC ")~"350"
+                                ,Coliform.2 %in% c("-","n/a") ~NA
+                                ,TRUE ~ Coliform.2)
+        ,Coliform.3 = case_when(Coliform.3 %in% c("TNTC","TNTC ")~"350"
+                                ,Coliform.3 %in% c("-","n/a") ~NA
+                                ,TRUE ~ Coliform.3)
+  ) %>%
   # drop the fake data
   filter(`Tester.#1` != "John Doe")
-  # change numeric variables to numeric
 
+  # change characters variables that should be numeric, to numeric
   for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
                     ,"Turbidity.(JTU)","E..coli.3","Avg..E..coli"
                     ,"Coliform.1","Coliform.2","Coliform.3","Avg..Coliform")) {
@@ -68,15 +98,32 @@ clean <- rawdata %>%
 ## Step 3: set up things for visualizations
 ## For now, just do it for site 1.
 
-sitechosen <- 1
+sitechosen <- 5
+
+sitepdf <- function(sitechosen) {
 
 ## The idea is: for each site, have the logo and a general description at the
 ## top. Then, 6 graphs - overall statement, temperature, ph, total hardness &
 ## total alkalinity, dissolved oxygen, and turbidity.
 ## Also need to put in ecoli & coliform
+
+# Step 3a. Create the data for just the specific site
 sitespecificdata <- clean %>% filter(`Site.#` == sitechosen) %>%
   arrange(Date.Tested)
 
+volunteers <- sitespecificdata %>%
+  select(`Tester.#1`,`Tester.#2`,Date.Tested) %>%
+  mutate(id = row.names(sitespecificdata)) %>%
+  pivot_longer(!c(id,Date.Tested),names_to = "volunteerNumber"
+               ,values_to="volunteer") %>%
+  group_by(volunteer) %>%
+  mutate(count = n() ) %>%
+  ungroup() %>%
+  mutate(min = min(count),max=max(count),avg=round(mean(count),1)) %>%
+  select(min,max,avg) %>%
+  distinct()
+
+# Step 3b. Write titles and such for each graph
 nameofsite <- unique(sitespecificdata$Waterbody)
 numberoftests <- length(unique(sitespecificdata$Date.Tested))
 numberofvolunteers <- length(unique(c(unique(sitespecificdata$`Tester.#1`)
@@ -116,6 +163,7 @@ hAndASubtitle <- str_glue("Higher alkalinity provides a buffer against changes
                           the concentration<br>
                           of calcium and magnesium ions in water.")
 
+# Step 3c. first plot is a combined plot: logo + description
 # create a placeholder dataframe for the logo so we can use it firstgraphB
 info <- data.frame(x = 1,y = 1,image = logo)
 
@@ -165,7 +213,7 @@ firstgraphB <-
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
-
+# Step 3d. Temperature graph
 temperature <-
   sitespecificdata %>%
   ggplot(aes(x=Date.Tested,y=Water.Temp)) +
@@ -196,11 +244,17 @@ temperature <-
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
-        ,plot.title = element_markdown(size=titlesize,face="bold",margin=margin(t=titlemarginT,r=titlemarginR,b=titlemarginB,l=titlemarginL))
+        ,plot.title = element_markdown(size=titlesize,face="bold"
+                                       ,margin=margin(t=titlemarginT
+                                                      ,r=titlemarginR
+                                                      ,b=titlemarginB
+                                                      ,l=titlemarginL))
         ,plot.subtitle = element_markdown(size=subtitlesize)
         ,plot.caption = element_markdown(size=captionsize)
-        ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB,l=plotmarginL))
+        ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
+                              ,l=plotmarginL))
 
+# Step 3e. pH graph
 phGraph <-
   sitespecificdata %>%
     ggplot(aes(x=Date.Tested,y=pH)) +
@@ -211,7 +265,8 @@ phGraph <-
               ,color=light,fill=light)+
     geom_point(aes(x=Date.Tested,y=pH),color=main) +
     geom_line(aes(x=Date.Tested,y=pH),color=main) +
-    geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
+    geom_text(data = sitespecificdata %>%
+                filter(Date.Tested == max(Date.Tested))
               ,aes(x=Date.Tested+1,y=pH),color=main
               ,label="pH",hjust=0,size=textlabelsize) +
     scale_y_continuous(lim=c(0,14),breaks=seq(0,14,1),labels=seq(0,14,1)) +
@@ -226,11 +281,18 @@ phGraph <-
           ,axis.title.x = element_blank()
           ,axis.line.y = element_line(color=dark)
           ,axis.ticks.y = element_line(color=dark)
-          ,plot.title = element_markdown(size=titlesize,face="bold",margin=margin(t=titlemarginT,r=titlemarginR,b=titlemarginB,l=titlemarginL))
+          ,plot.title = element_markdown(size=titlesize
+                                         ,face="bold"
+                                         ,margin=margin(t=titlemarginT
+                                                        ,r=titlemarginR
+                                                        ,b=titlemarginB
+                                                        ,l=titlemarginL))
           ,plot.subtitle = element_markdown(size=subtitlesize)
           ,plot.caption = element_markdown(size=captionsize)
-          ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB,l=plotmarginL))
+          ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
+                                ,l=plotmarginL))
 
+# Step 3f. Hardness & Alkalinity graph
 hAndAGraph <-   sitespecificdata %>%
   ggplot(aes(x=Date.Tested,y=Total.Hardness)) +
   coord_cartesian(clip="off") +
@@ -256,27 +318,36 @@ hAndAGraph <-   sitespecificdata %>%
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
-        ,plot.title = element_markdown(size=titlesize,face="bold",margin=margin(t=titlemarginT,r=titlemarginR,b=titlemarginB,l=titlemarginL))
+        ,plot.title = element_markdown(size=titlesize,face="bold"
+                                       ,margin=margin(t=titlemarginT
+                                                      ,r=titlemarginR
+                                                      ,b=titlemarginB
+                                                      ,l=titlemarginL))
         ,plot.subtitle = element_markdown(size=subtitlesize)
         ,plot.caption = element_markdown(size=captionsize)
-        ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB,l=plotmarginL))
+        ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
+                              ,l=plotmarginL))
 
-
-## Step 4: loop through the sites and print the PDFs
-## for now, just doing it for site #1
-
-
-pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
-    ,paper="letter",width=8,height=11)
-
+# Step 3g. Bring all the graphs together
 ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
           ,phGraph,hAndAGraph
           # when I've created the final graphs, I'll update these two things
           ,phGraph,hAndAGraph
           ,nrow=3,ncol=2)
 
-dev.off()
+}
 
+## Step 4: loop through the sites and print the PDFs
+
+for (sitechosen in 1:8) {
+
+  pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
+      ,paper="letter",width=8,height=11)
+
+  sitepdf(sitechosen)
+
+  dev.off()
+}
 
 
 
