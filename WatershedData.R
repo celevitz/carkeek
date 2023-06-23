@@ -99,6 +99,7 @@ clean <- rawdata %>%
 ## For now, just do it for site 1.
 
 sitechosen <- 5
+#pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep=""),paper="letter",width=8,height=11)
 
 sitepdf <- function(sitechosen) {
 
@@ -128,9 +129,14 @@ nameofsite <- unique(sitespecificdata$Waterbody)
 numberoftests <- length(unique(sitespecificdata$Date.Tested))
 numberofvolunteers <- length(unique(c(unique(sitespecificdata$`Tester.#1`)
                                       ,unique(sitespecificdata$`Tester.#2`))))
-overalltitle <- str_glue("{nameofsite} (Site #{sitechosen}) has been tested
-                        {numberoftests} times by {numberofvolunteers}
-                         volunteers.<br><br>Thank you for your time!")
+overalltitle <- str_glue(str_wrap("{nameofsite} (Site #{sitechosen}) has been
+                        tested {numberoftests} times<br>
+                        by {numberofvolunteers} volunteers. Individuals
+                        volunteered between {volunteers$min} <br>
+                        and {volunteers$max} times, with an average of
+                        {volunteers$avg}.<br><br>
+                        Thank you for your time!"
+                        ))
 overallsubtitle <- str_glue("If you are interested in volunteering, have
                             questions, or would like<br>to donate: email
                             info at CarkeekWatershed.org")
@@ -190,7 +196,7 @@ firstgraphA <-
 
 firstgraphB <-
   ggplot(info,aes(x=x,y=y)) +
-  labs(title=overalltitle
+  labs(title=str_wrap(overalltitle,width=50)
        ,subtitle=overallsubtitle
        ,caption=overallcaption) +
   theme_minimal() +
@@ -206,9 +212,9 @@ firstgraphB <-
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL)
-                                       ,hjust=.5,color=main)
+                                       ,hjust=0,color=main)
         ,plot.subtitle = element_markdown(size=subtitlesize
-                                          ,hjust=.5,color=mid2)
+                                          ,hjust=0,color=mid2)
         ,plot.caption = element_markdown(size=captionsize,color=mid2)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
@@ -328,7 +334,12 @@ hAndAGraph <-   sitespecificdata %>%
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
-# Step 3g. Bring all the graphs together
+# Step 3g. Bacteria levels
+
+
+# Step 3h. dissolved oxygen
+
+# Step 3i. Bring all the graphs together
 ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
           ,phGraph,hAndAGraph
           # when I've created the final graphs, I'll update these two things
