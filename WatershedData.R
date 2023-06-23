@@ -109,6 +109,7 @@ sitepdf <- function(sitechosen) {
 ## Also need to put in ecoli & coliform
 
 # Step 3a. Create the data for just the specific site
+  # and then write a little bit about the site
 sitespecificdata <- clean %>% filter(`Site.#` == sitechosen) %>%
   arrange(Date.Tested)
 
@@ -117,26 +118,50 @@ volunteers <- sitespecificdata %>%
   mutate(id = row.names(sitespecificdata)) %>%
   pivot_longer(!c(id,Date.Tested),names_to = "volunteerNumber"
                ,values_to="volunteer") %>%
+  filter(!(is.na(volunteer))) %>%
   group_by(volunteer) %>%
   mutate(count = n() ) %>%
   ungroup() %>%
   mutate(min = min(count),max=max(count),avg=round(mean(count),1)) %>%
   select(min,max,avg) %>%
   distinct()
+volunteercountrange <- str_glue("Individuals volunteered between {volunteers$min}
+                              and {volunteers$max} times, with an<br>average of
+                              {volunteers$avg}.")
+
+numberoftimeswithtwopeople <- str_glue("{nrow(sitespecificdata %>%
+  filter(!(is.na(`Tester.#1`)) & !(is.na(`Tester.#2`))) )} of these times had
+                                       two volunteers,<br>which is best practice.")
+
+volunteerhours <- sitespecificdata %>%
+  select(`Tester.#1`,`Tester.#2`,Date.Tested) %>%
+  mutate(id = row.names(sitespecificdata)) %>%
+  pivot_longer(!c(id,Date.Tested),names_to = "volunteerNumber"
+               ,values_to="volunteer") %>%
+  filter(!(is.na(volunteer))) %>%
+  group_by(volunteer) %>%
+  summarise(count = n() ,hours=2*count) %>%
+  ungroup() %>%
+  summarise(totalhours = sum(hours))
+volunteertime <- str_glue("This is an estimated {volunteerhours$totalhours}
+                          hours of<br>volunteer time.")
 
 # Step 3b. Write titles and such for each graph
 nameofsite <- unique(sitespecificdata$Waterbody)
 numberoftests <- length(unique(sitespecificdata$Date.Tested))
-numberofvolunteers <- length(unique(c(unique(sitespecificdata$`Tester.#1`)
-                                      ,unique(sitespecificdata$`Tester.#2`))))
-overalltitle <- str_glue(str_wrap("{nameofsite} (Site #{sitechosen}) has been
-                        tested {numberoftests} times<br>
-                        by {numberofvolunteers} volunteers. Individuals
-                        volunteered between {volunteers$min} <br>
-                        and {volunteers$max} times, with an average of
-                        {volunteers$avg}.<br><br>
-                        Thank you for your time!"
-                        ))
+numberofvolunteers <- length(unique(c(unique(sitespecificdata$`Tester.#1`[
+                                      !(is.na(sitespecificdata$`Tester.#1`))])
+                                  ,unique(sitespecificdata$`Tester.#2`[
+                                    !(is.na(sitespecificdata$`Tester.#2`))]))))
+
+
+overalltitle <- str_glue("{nameofsite} (Site #{sitechosen}) has been tested
+                        {numberoftests} times<br>
+                        by {numberofvolunteers} volunteers.
+                         {numberoftimeswithtwopeople}<br><br>
+                        {volunteercountrange}
+                        {volunteertime}<br><br>
+                        Thank you, volunteers!" )
 overallsubtitle <- str_glue("If you are interested in volunteering, have
                             questions, or would like<br>to donate: email
                             info at CarkeekWatershed.org")
