@@ -297,10 +297,6 @@ phGraph <-
               ,color=light,fill=light)+
     geom_point(aes(x=Date.Tested,y=pH),color=main) +
     geom_line(aes(x=Date.Tested,y=pH),color=main) +
-    geom_text(data = sitespecificdata %>%
-                filter(Date.Tested == max(Date.Tested))
-              ,aes(x=Date.Tested+1,y=pH),color=main
-              ,label="pH",hjust=0,size=textlabelsize) +
     scale_y_continuous(lim=c(0,14),breaks=seq(0,14,1),labels=seq(0,14,1)) +
     scale_x_date(date_labels = "%b %y",date_breaks = "month") +
     ylab("pH") +
