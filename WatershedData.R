@@ -29,7 +29,7 @@ light <- "#f0e0cc"
 highlight <- "#46bdc6"
 
 axistitlesize <- 20
-axissize <- 18
+axissize <- 7
 titlesize <- 10
 subtitlesize <- 8
 captionsize <- 5
@@ -264,6 +264,7 @@ temperature <-
             ,aes(x=Date.Tested+1,y=Air.Temp),color=mid2
             ,label="Air temperature",hjust=0,size=textlabelsize) +
   scale_y_continuous(lim=c(0,27)) +
+  scale_x_date(date_labels = "%b %y",date_breaks = "month") +
   ylab("Temperature (Celsius)") +
   labs(title=temptitle
        ,subtitle=tempsubtitle) +
@@ -271,7 +272,7 @@ temperature <-
   theme(panel.grid = element_blank()
         ,panel.background = element_blank()
         ,plot.background = element_blank()
-        ,axis.text = element_markdown()
+        ,axis.text = element_markdown(size=axissize)
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
@@ -301,6 +302,7 @@ phGraph <-
               ,aes(x=Date.Tested+1,y=pH),color=main
               ,label="pH",hjust=0,size=textlabelsize) +
     scale_y_continuous(lim=c(0,14),breaks=seq(0,14,1),labels=seq(0,14,1)) +
+    scale_x_date(date_labels = "%b %y",date_breaks = "month") +
     ylab("pH") +
     labs(title=phtitle
          ,subtitle=phsubtitle) +
@@ -308,7 +310,7 @@ phGraph <-
     theme(panel.grid = element_blank()
           ,panel.background = element_blank()
           ,plot.background = element_blank()
-          ,axis.text = element_markdown()
+          ,axis.text = element_markdown(size=axissize)
           ,axis.title.x = element_blank()
           ,axis.line.y = element_line(color=dark)
           ,axis.ticks.y = element_line(color=dark)
@@ -338,6 +340,7 @@ hAndAGraph <-   sitespecificdata %>%
             ,aes(x=Date.Tested+1,y=Total.ALK),color=mid2
             ,label="Total Alkalinity",hjust=0,size=textlabelsize) +
   scale_y_continuous(lim=c(0,max(clean$Total.ALK,na.rm=T))) +
+  scale_x_date(date_labels = "%b %y",date_breaks = "month") +
   ylab("mg/L") +
   labs(title=hardnessalkalinitytitle
        ,subtitle=hAndASubtitle) +
@@ -345,7 +348,7 @@ hAndAGraph <-   sitespecificdata %>%
   theme(panel.grid = element_blank()
         ,panel.background = element_blank()
         ,plot.background = element_blank()
-        ,axis.text = element_markdown()
+        ,axis.text = element_markdown(size=axissize)
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
