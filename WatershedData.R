@@ -96,11 +96,40 @@ clean <- rawdata %>%
 
 
 ## Step 3: set up things for visualizations
-## For now, just do it for site 1.
 
-sitechosen <- 5
-#pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
-# ,paper="letter",width=8,height=11)
+# For testing
+  sitechosen <- 5
+
+# write the info about each measure:
+overallsubtitle <- str_wrap(str_glue("If you are interested in volunteering,
+                          have questions, or would like to donate: email
+                          info at CarkeekWatershed.org"),80)
+overallcaption <- str_glue("Analyzed by Carly Levitz and supported by
+                         Troy Beckner")
+
+temptitle <- str_glue("Water and air temperature")
+tempsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
+                        feeding of aquatic animals. It also affects how much
+                        dissolved oxygen the water can hold. Air temperature
+                        affects water temperature. The National Wildlife
+                        Federation says that the optimum water temperature
+                        range for chinook salmon is 12.8 to 17.8 degrees
+                                Celsius."),60)
+phtitle <- str_glue("pH levels")
+phsubtitle <- str_wrap(str_glue("pH measures how acidic or basic water is. A
+                              value of 7 is neutral. Less than 7 is acidic,
+                              and more than 7 is basic. pH can change over
+                              the course of a season (or a day). A pH less
+                              than 4.0 or more than 11.0 is usually lethal to
+                              fish and other organisms. pH between 6 and 8.5
+                              is usually ideal."),60)
+
+hardnessalkalinitytitle <- str_glue("Hardness and Alkilinity")
+hAndASubtitle <- str_wrap(str_glue("Higher alkalinity provides a buffer against
+                                 changes in pH, making it more stable for
+                                 aquatic life. Hardness is primarily the
+                                 concentration of calcium and magnesium ions
+                                 in water."),60)
 
 sitepdf <- function(sitechosen) {
 
@@ -159,35 +188,6 @@ overalltitle <- str_wrap(str_glue("{nameofsite} (Site #{sitechosen}) has been
                         tested {numberoftests} times by {numberofvolunteers}
                         volunteers. {numberoftimeswithtwopeople} Thank you,
                                   volunteers!" ),40)
-overallsubtitle <- str_wrap(str_glue("If you are interested in volunteering,
-                            have questions, or would like to donate: email
-                            info at CarkeekWatershed.org"),80)
-overallcaption <- str_glue("Analyzed by Carly Levitz and supported by
-                           Troy Beckner")
-
-temptitle <- str_glue("Water and air temperature")
-tempsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
-                          feeding of aquatic animals. It also affects how much
-                          dissolved oxygen the water can hold. Air temperature
-                          affects water temperature. The National Wildlife
-                          Federation says that the optimum water temperature
-                          range for chinook salmon is 12.8 to 17.8 degrees
-                                  Celsius."),40)
-phtitle <- str_glue("pH levels")
-phsubtitle <- str_wrap(str_glue("pH measures how acidic or basic water is. A
-                                value of 7 is neutral. Less than 7 is acidic,
-                                and more than 7 is basic. pH can change over
-                                the course of a season (or a day). A pH less
-                                than 4.0 or more than 11.0 is usually lethal to
-                                fish and other organisms. pH between 6 and 8.5
-                                is usually ideal."))
-
-hardnessalkalinitytitle <- str_glue("Hardness and Alkilinity")
-hAndASubtitle <- str_wrap(str_glue("Higher alkalinity provides a buffer against
-                                   changes in pH, making it more stable for
-                                   aquatic life. Hardness is primarily the
-                                   concentration of calcium and magnesium ions
-                                   in water."))
 
 # Step 3c. first plot is a combined plot: logo + description
 # create a placeholder dataframe for the logo so we can use it firstgraphB
