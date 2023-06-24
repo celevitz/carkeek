@@ -138,7 +138,7 @@ DOsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
                         higher temperatures."),65)
 
 bacteriaTitle <- str_wrap("Bacteria levels",40)
-bacteriaSubtitle <- str_wrap(str_glue("E Coli & Coliform",65))
+bacteriaSubtitle <- str_wrap(str_glue("E Coli & Coliform"),65)
 
 sitepdf <- function(sitechosen) {
 
