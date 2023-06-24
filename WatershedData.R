@@ -107,14 +107,10 @@ overallsubtitle <- str_wrap(str_glue("If you are interested in volunteering,
 overallcaption <- str_glue("Analyzed by Carly Levitz and supported by
                          Troy Beckner")
 
-temptitle <- str_glue("Water and air temperature")
-tempsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
-                        feeding of aquatic animals. It also affects how much
-                        dissolved oxygen the water can hold. Air temperature
-                        affects water temperature. The National Wildlife
-                        Federation says that the optimum water temperature
-                        range for chinook salmon is 12.8 to 17.8 degrees
-                                Celsius."),65)
+temptitle <- str_glue("Air temperature")
+tempsubtitle <- str_wrap(str_glue("Air temperature affects water temperature.
+                                  (This graph will show other weather when
+                                  data on weather are captured.)"),65)
 phtitle <- str_glue("pH levels")
 phsubtitle <- str_wrap(str_glue("pH measures how acidic or basic water is. A
                               value of 7 is neutral. Less than 7 is acidic,
@@ -130,6 +126,16 @@ hAndASubtitle <- str_wrap(str_glue("Higher alkalinity provides a buffer against
                                  aquatic life. Hardness is primarily the
                                  concentration of calcium and magnesium ions
                                  in water."),65)
+
+DOtitle <- str_wrap("Dissolved Oxygen (DO) and Water Temperature",40)
+DOsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
+                        feeding of aquatic animals. It also affects how much
+                        dissolved oxygen the water can hold. Aquatic animals and
+                        plants need oxygen to survive. Dissolved oxygen (DO)
+                        measures how much oxygen is in the water. A value of 5
+                        parts per million (ppm) is considered 'good' and values
+                        between 7 and 11 are 'very good.' DO decreases with
+                        higher temperatures."),65)
 
 sitepdf <- function(sitechosen) {
 
@@ -248,13 +254,13 @@ temperature <-
             ,xmax=max(sitespecificdata$Date.Tested)
             ,ymin=12.8,ymax=17.8
             ,color=light,fill=light)+
-  geom_point(aes(x=Date.Tested,y=Water.Temp),color=main) +
+  # geom_point(aes(x=Date.Tested,y=Water.Temp),color=main) +
   geom_point(aes(x=Date.Tested,y=Air.Temp),color=mid2) +
-  geom_line(aes(x=Date.Tested,y=Water.Temp),color=main) +
+  # geom_line(aes(x=Date.Tested,y=Water.Temp),color=main) +
   geom_line(aes(x=Date.Tested,y=Air.Temp),color=mid2) +
-  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-             ,aes(x=Date.Tested+1,y=Water.Temp),color=main
-            ,label="Water temperature",hjust=0,size=textlabelsize) +
+  # geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
+  #            ,aes(x=Date.Tested+1,y=Water.Temp),color=main
+  #           ,label="Water temperature",hjust=0,size=textlabelsize) +
   geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
             ,aes(x=Date.Tested+1,y=Air.Temp),color=mid2
             ,label="Air temperature",hjust=0,size=textlabelsize) +
@@ -357,12 +363,56 @@ hAndAGraph <-   sitespecificdata %>%
 
 
 # Step 3h. dissolved oxygen
+DOgraph <- sitespecificdata %>%
+  ggplot(aes(x=Date.Tested,y=Average.DO)) +
+  coord_cartesian(clip="off") +
+  geom_rect(xmin=min(sitespecificdata$Date.Tested)
+            ,xmax=max(sitespecificdata$Date.Tested)
+            ,ymin=7,ymax=11
+            ,color=light,fill=light)+
+  geom_point(aes(x=Date.Tested,y=Average.DO),color=main) +
+  #geom_point(aes(x=Date.Tested,y=`%.Ox..Sat.`),color=mid2) +
+  geom_point(aes(x=Date.Tested,y=Water.Temp),color=mid2) +
+  geom_line(aes(x=Date.Tested,y=Average.DO),color=main) +
+  #geom_line(aes(x=Date.Tested,y=`%.Ox..Sat.`),color=mid2) +
+  geom_line(aes(x=Date.Tested,y=Water.Temp),color=mid2) +
+  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
+            ,aes(x=Date.Tested+1,y=Average.DO),color=main
+            ,label="Average dissolved\noxygen",hjust=0,size=textlabelsize) +
+  # geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
+  #           ,aes(x=Date.Tested+1,y=`%.Ox..Sat.`),color=mid2
+  #           ,label="% oxygen saturation",hjust=0,size=textlabelsize) +
+  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
+            ,aes(x=Date.Tested+1,y=Water.Temp),color=mid2
+            ,label="Water temperature",hjust=0,size=textlabelsize) +
+  scale_y_continuous(lim=c(0,max(clean$Average.DO,na.rm=T))) +
+  scale_x_date(date_labels = "%b %y",date_breaks = "month") +
+  ylab("DO parts per million\nWater temperature (Celsius)") +
+  labs(title=DOtitle
+       ,subtitle=DOsubtitle) +
+  theme_minimal() +
+  theme(panel.grid = element_blank()
+        ,panel.background = element_blank()
+        ,plot.background = element_blank()
+        ,axis.text = element_markdown(size=axissize)
+        ,axis.line.y = element_line(color=dark)
+        ,axis.ticks.y = element_line(color=dark)
+        ,axis.title.x = element_blank()
+        ,plot.title = element_text(size=titlesize,face="bold"
+                                   ,margin=margin(t=titlemarginT
+                                                  ,r=titlemarginR
+                                                  ,b=titlemarginB
+                                                  ,l=titlemarginL))
+        ,plot.subtitle = element_text(size=subtitlesize)
+        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
+                              ,l=plotmarginL))
 
 # Step 3i. Bring all the graphs together
 ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
-          ,phGraph,hAndAGraph
+          ,phGraph,DOgraph
           # when I've created the final graphs, I'll update these two things
-          ,phGraph,hAndAGraph
+          ,hAndAGraph,hAndAGraph
           ,nrow=3,ncol=2)
 
 }
