@@ -49,6 +49,9 @@ logo <- paste(directory,"CWCAPlogo-1-white-1024x346.png",sep="")
 ### Step 2a. Bring in data
 clean <- read.csv(paste0(directory,"H20Data.csv"),stringsAsFactors = FALSE)
 
+### Step 2b. Clean data
+  clean$dateTested <- as.Date(clean$dateTested)
+
 ## Step 3: set up things for visualizations
 
 # For testing
@@ -140,7 +143,7 @@ volunteertime <- str_glue("This is an estimated {volunteerhours$totalhours}
                           hours of volunteer time.")
 
 # Step 3b. Write titles and such for each graph
-nameofsite <- unique(sitespecificdata$Waterbody)
+nameofsite <- unique(sitespecificdata$waterbody)
 numberoftests <- length(unique(sitespecificdata$dateTested))
 numberofvolunteers <- length(unique(c(unique(sitespecificdata$tester1[
                                       !(is.na(sitespecificdata$tester1))])
@@ -211,9 +214,9 @@ temperature <-
   #           ,xmax=max(sitespecificdata$dateTested)
   #           ,ymin=12.8,ymax=17.8
   #           ,color=light,fill=light)+
-  # geom_point(aes(x=dateTested,y=waterTemp),color=main) +
+  # geom_point(aes(x=dateTested+1,y=waterTemp),color=main) +
   geom_point(aes(x=dateTested,y=airTemp),color=mid2) +
-  # geom_line(aes(x=dateTested,y=waterTemp),color=main) +
+  # geom_line(aes(x=dateTested+1,y=waterTemp),color=main) +
   geom_line(aes(x=dateTested,y=airTemp),color=mid2) +
   # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
   #            ,aes(x=dateTested+1,y=waterTemp),color=main
