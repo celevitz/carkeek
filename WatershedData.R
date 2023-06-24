@@ -99,7 +99,8 @@ clean <- rawdata %>%
 ## For now, just do it for site 1.
 
 sitechosen <- 5
-#pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep=""),paper="letter",width=8,height=11)
+#pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
+# ,paper="letter",width=8,height=11)
 
 sitepdf <- function(sitechosen) {
 
@@ -125,13 +126,13 @@ volunteers <- sitespecificdata %>%
   mutate(min = min(count),max=max(count),avg=round(mean(count),1)) %>%
   select(min,max,avg) %>%
   distinct()
-volunteercountrange <- str_glue("Individuals volunteered between {volunteers$min}
-                              and {volunteers$max} times, with an<br>average of
+volunteercountrange <-str_glue("Individuals volunteered between {volunteers$min}
+                              and {volunteers$max} times, with an average of
                               {volunteers$avg}.")
 
 numberoftimeswithtwopeople <- str_glue("{nrow(sitespecificdata %>%
   filter(!(is.na(`Tester.#1`)) & !(is.na(`Tester.#2`))) )} of these times had
-                                       two volunteers,<br>which is best practice.")
+                                     two volunteers, which is best practice.")
 
 volunteerhours <- sitespecificdata %>%
   select(`Tester.#1`,`Tester.#2`,Date.Tested) %>%
@@ -144,7 +145,7 @@ volunteerhours <- sitespecificdata %>%
   ungroup() %>%
   summarise(totalhours = sum(hours))
 volunteertime <- str_glue("This is an estimated {volunteerhours$totalhours}
-                          hours of<br>volunteer time.")
+                          hours of volunteer time.")
 
 # Step 3b. Write titles and such for each graph
 nameofsite <- unique(sitespecificdata$Waterbody)
@@ -154,45 +155,39 @@ numberofvolunteers <- length(unique(c(unique(sitespecificdata$`Tester.#1`[
                                   ,unique(sitespecificdata$`Tester.#2`[
                                     !(is.na(sitespecificdata$`Tester.#2`))]))))
 
-
-overalltitle <- str_glue("{nameofsite} (Site #{sitechosen}) has been tested
-                        {numberoftests} times<br>
-                        by {numberofvolunteers} volunteers.
-                         {numberoftimeswithtwopeople}<br><br>
-                        {volunteercountrange}
-                        {volunteertime}<br><br>
-                        Thank you, volunteers!" )
-overallsubtitle <- str_glue("If you are interested in volunteering, have
-                            questions, or would like<br>to donate: email
-                            info at CarkeekWatershed.org")
+overalltitle <- str_wrap(str_glue("{nameofsite} (Site #{sitechosen}) has been
+                        tested {numberoftests} times by {numberofvolunteers}
+                        volunteers. {numberoftimeswithtwopeople} Thank you,
+                                  volunteers!" ),40)
+overallsubtitle <- str_wrap(str_glue("If you are interested in volunteering,
+                            have questions, or would like to donate: email
+                            info at CarkeekWatershed.org"),80)
 overallcaption <- str_glue("Analyzed by Carly Levitz and supported by
                            Troy Beckner")
 
 temptitle <- str_glue("Water and air temperature")
-tempsubtitle <- str_glue("Water temperature can affect the breeding and feeding
-                         of aquatic<br>
-                         animals. It also affects how much dissolved oxygen the
-                         water can hold.<br>
-                         Air temperature affects water temperature. The National
-                         Wildlife<br>
-                         Federation says that the optimum water temperature
-                         range for chinook<br>
-                         salmon is 12.8 to 17.8 degrees Celsius.")
+tempsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
+                          feeding of aquatic animals. It also affects how much
+                          dissolved oxygen the water can hold. Air temperature
+                          affects water temperature. The National Wildlife
+                          Federation says that the optimum water temperature
+                          range for chinook salmon is 12.8 to 17.8 degrees
+                                  Celsius."),40)
 phtitle <- str_glue("pH levels")
-phsubtitle <- str_glue("pH measures how acidic or basic water is. A value of 7
-                        is neutral.<br>
-                        Less than 7 is acidic, and more than 7 is basic. pH can
-                        change over<br>the course of a season (or a day). A pH
-                        less than 4.0 or more than<br>
-                        11.0 is usually lethal to fish and other organisms. pH
-                       <br>between 6 and 8.5 is usually ideal.")
+phsubtitle <- str_wrap(str_glue("pH measures how acidic or basic water is. A
+                                value of 7 is neutral. Less than 7 is acidic,
+                                and more than 7 is basic. pH can change over
+                                the course of a season (or a day). A pH less
+                                than 4.0 or more than 11.0 is usually lethal to
+                                fish and other organisms. pH between 6 and 8.5
+                                is usually ideal."))
 
 hardnessalkalinitytitle <- str_glue("Hardness and Alkilinity")
-hAndASubtitle <- str_glue("Higher alkalinity provides a buffer against changes
-                          in pH, making it<br>
-                          more stable for aquatic life. Hardness is primarily
-                          the concentration<br>
-                          of calcium and magnesium ions in water.")
+hAndASubtitle <- str_wrap(str_glue("Higher alkalinity provides a buffer against
+                                   changes in pH, making it more stable for
+                                   aquatic life. Hardness is primarily the
+                                   concentration of calcium and magnesium ions
+                                   in water."))
 
 # Step 3c. first plot is a combined plot: logo + description
 # create a placeholder dataframe for the logo so we can use it firstgraphB
@@ -232,13 +227,13 @@ firstgraphB <-
         ,axis.line = element_blank()
         ,axis.ticks = element_blank()
         ,axis.title = element_blank()
-        ,plot.title = element_markdown(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold"
                                        ,margin=margin(t=titlemarginT
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL)
                                        ,hjust=0,color=main)
-        ,plot.subtitle = element_markdown(size=subtitlesize
+        ,plot.subtitle = element_text(size=subtitlesize
                                           ,hjust=0,color=mid2)
         ,plot.caption = element_markdown(size=captionsize,color=mid2)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
@@ -276,12 +271,12 @@ temperature <-
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
-        ,plot.title = element_markdown(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold"
                                        ,margin=margin(t=titlemarginT
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL))
-        ,plot.subtitle = element_markdown(size=subtitlesize)
+        ,plot.subtitle = element_text(size=subtitlesize)
         ,plot.caption = element_markdown(size=captionsize)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
@@ -310,13 +305,13 @@ phGraph <-
           ,axis.title.x = element_blank()
           ,axis.line.y = element_line(color=dark)
           ,axis.ticks.y = element_line(color=dark)
-          ,plot.title = element_markdown(size=titlesize
+          ,plot.title = element_text(size=titlesize
                                          ,face="bold"
                                          ,margin=margin(t=titlemarginT
                                                         ,r=titlemarginR
                                                         ,b=titlemarginB
                                                         ,l=titlemarginL))
-          ,plot.subtitle = element_markdown(size=subtitlesize)
+          ,plot.subtitle = element_text(size=subtitlesize)
           ,plot.caption = element_markdown(size=captionsize)
           ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                                 ,l=plotmarginL))
@@ -348,12 +343,12 @@ hAndAGraph <-   sitespecificdata %>%
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
-        ,plot.title = element_markdown(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold"
                                        ,margin=margin(t=titlemarginT
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL))
-        ,plot.subtitle = element_markdown(size=subtitlesize)
+        ,plot.subtitle = element_text(size=subtitlesize)
         ,plot.caption = element_markdown(size=captionsize)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
