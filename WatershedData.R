@@ -137,6 +137,9 @@ DOsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
                         between 7 and 11 are 'very good.' DO decreases with
                         higher temperatures."),65)
 
+bacteriaTitle <- str_wrap("Bacteria levels",40)
+bacteriaSubtitle <- str_wrap(str_glue("E Coli & Coliform",65))
+
 sitepdf <- function(sitechosen) {
 
 ## The idea is: for each site, have the logo and a general description at the
@@ -360,6 +363,43 @@ hAndAGraph <-   sitespecificdata %>%
                               ,l=plotmarginL))
 
 # Step 3g. Bacteria levels
+bacteriaGraph <- sitespecificdata %>%
+  ggplot(aes(x=Date.Tested)) +
+  coord_cartesian(clip="off") +
+  geom_point(aes(x=Date.Tested,y=`Avg..Coliform`/10),color=main) +
+  geom_line(aes(x=Date.Tested,y=`Avg..Coliform`/10),color=main) +
+  geom_point(aes(x=Date.Tested,y=`Avg..E..coli`),color=mid2) +
+  geom_line(aes(x=Date.Tested,y=`Avg..E..coli`),color=mid2) +
+  scale_y_continuous(
+    # Features of the first axis
+    name = "Average E Coli",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~., name="Average Coliform"
+                        ,breaks=seq(0,25,5)
+                        ,label=seq(0,250,50))  ) +
+  scale_x_date(date_labels = "%b %y",date_breaks = "month") +
+  labs(title=bacteriaTitle,subtitle=bacteriaSubtitle) +
+  theme_minimal() +
+  theme(panel.grid = element_blank()
+        ,panel.background = element_blank()
+        ,plot.background = element_blank()
+        ,axis.title.x = element_blank()
+        ,axis.text = element_markdown(size=axissize)
+        ,axis.line.y.left = element_line(color=dark)
+        ,axis.ticks.y.left = element_line(color=dark)
+        ,axis.title.y.left = element_text(color=main)
+        ,axis.title.y.right = element_text(color=mid2)
+        ,axis.line.y.right = element_line(color=mid2)
+        ,axis.ticks.y.right = element_line(color=mid2)
+        ,plot.title = element_text(size=titlesize,face="bold"
+                                   ,margin=margin(t=titlemarginT
+                                                  ,r=titlemarginR
+                                                  ,b=titlemarginB
+                                                  ,l=titlemarginL))
+        ,plot.subtitle = element_text(size=subtitlesize)
+        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
+                              ,l=plotmarginL))
 
 
 # Step 3h. dissolved oxygen
@@ -411,8 +451,7 @@ DOgraph <- sitespecificdata %>%
 # Step 3i. Bring all the graphs together
 ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
           ,phGraph,DOgraph
-          # when I've created the final graphs, I'll update these two things
-          ,hAndAGraph,hAndAGraph
+          ,hAndAGraph,bacteriaGraph
           ,nrow=3,ncol=2)
 
 }
