@@ -144,7 +144,7 @@ volunteertime <- str_glue("This is an estimated {volunteerhours$totalhours}
 
 # Step 3b. Write titles and such for each graph
 nameofsite <- unique(sitespecificdata$waterbody)
-numberoftests <- length(unique(sitespecificdata$dateTested))
+numberoftests <- nrow(sitespecificdata)
 numberofvolunteers <- length(unique(c(unique(sitespecificdata$tester1[
                                       !(is.na(sitespecificdata$tester1))])
                                   ,unique(sitespecificdata$tester2[
