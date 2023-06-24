@@ -61,6 +61,18 @@ for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
   clean[,charvar] <- as.numeric(unlist(clean[,charvar]))
 }
 
-## Step 3. Export data
-write.csv(clean,paste0(directory,exportdataname,".csv"),row.names=TRUE)
+## rename the data
+names(clean) <- c("id","siteNumber","tester1","tester2","dateTested","month"
+                  ,"timeTested","isThereASiteNumber","isThereATester"
+                  ,"isTheDateAppropriate","exclude","siteDateId","year"
+                  ,"previousYear","monthCalculated","previousMonth","watershed"
+                  ,"waterbody","waterbodyCondition","weatherConditions"
+                  ,"airTemp","waterTemp","pH","do1","do2","averageDo","OxSat"
+                  ,"dropAlk","totalAlk","dropHardness","totalHardness"
+                  ,"turbidityJTU","secchiDepth","ecoli1","ecoli2","ecoli3"
+                  ,"avgEcoli","coliform1","coliform2","coliform3","avgColiform"
+                  ,"comments")
+
+## Step 4. Export data
+write.csv(clean,paste0(directory,exportdataname,".csv"),row.names=FALSE)
 

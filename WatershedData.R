@@ -103,13 +103,13 @@ sitepdf <- function(sitechosen) {
 
 # Step 3a. Create the data for just the specific site
   # and then write a little bit about the site
-sitespecificdata <- clean %>% filter(`Site.#` == sitechosen) %>%
-  arrange(Date.Tested)
+sitespecificdata <- clean %>% filter(siteNumber == sitechosen) %>%
+  arrange(dateTested)
 
 volunteers <- sitespecificdata %>%
-  select(`Tester.#1`,`Tester.#2`,Date.Tested) %>%
+  select(tester1,tester2,dateTested) %>%
   mutate(id = row.names(sitespecificdata)) %>%
-  pivot_longer(!c(id,Date.Tested),names_to = "volunteerNumber"
+  pivot_longer(!c(id,dateTested),names_to = "volunteerNumber"
                ,values_to="volunteer") %>%
   filter(!(is.na(volunteer))) %>%
   group_by(volunteer) %>%
@@ -123,13 +123,13 @@ volunteercountrange <-str_glue("Individuals volunteered between {volunteers$min}
                               {volunteers$avg}.")
 
 numberoftimeswithtwopeople <- str_glue("{nrow(sitespecificdata %>%
-  filter(!(is.na(`Tester.#1`)) & !(is.na(`Tester.#2`))) )} of these times had
+  filter(!(is.na(tester1)) & !(is.na(tester2))) )} of these times had
                                      two volunteers, which is best practice.")
 
 volunteerhours <- sitespecificdata %>%
-  select(`Tester.#1`,`Tester.#2`,Date.Tested) %>%
+  select(tester1,tester2,dateTested) %>%
   mutate(id = row.names(sitespecificdata)) %>%
-  pivot_longer(!c(id,Date.Tested),names_to = "volunteerNumber"
+  pivot_longer(!c(id,dateTested),names_to = "volunteerNumber"
                ,values_to="volunteer") %>%
   filter(!(is.na(volunteer))) %>%
   group_by(volunteer) %>%
@@ -141,11 +141,11 @@ volunteertime <- str_glue("This is an estimated {volunteerhours$totalhours}
 
 # Step 3b. Write titles and such for each graph
 nameofsite <- unique(sitespecificdata$Waterbody)
-numberoftests <- length(unique(sitespecificdata$Date.Tested))
-numberofvolunteers <- length(unique(c(unique(sitespecificdata$`Tester.#1`[
-                                      !(is.na(sitespecificdata$`Tester.#1`))])
-                                  ,unique(sitespecificdata$`Tester.#2`[
-                                    !(is.na(sitespecificdata$`Tester.#2`))]))))
+numberoftests <- length(unique(sitespecificdata$dateTested))
+numberofvolunteers <- length(unique(c(unique(sitespecificdata$tester1[
+                                      !(is.na(sitespecificdata$tester1))])
+                                  ,unique(sitespecificdata$tester2[
+                                    !(is.na(sitespecificdata$tester2))]))))
 
 overalltitle <- str_wrap(str_glue("{nameofsite} (Site #{sitechosen}) has been
                         tested {numberoftests} times by {numberofvolunteers}
@@ -205,21 +205,21 @@ firstgraphB <-
 # Step 3d. Temperature graph
 temperature <-
   sitespecificdata %>%
-  ggplot(aes(x=Date.Tested,y=Water.Temp)) +
+  ggplot(aes(x=dateTested,y=waterTemp)) +
   coord_cartesian(clip="off") +
-  # geom_rect(xmin=min(sitespecificdata$Date.Tested)
-  #           ,xmax=max(sitespecificdata$Date.Tested)
+  # geom_rect(xmin=min(sitespecificdata$dateTested)
+  #           ,xmax=max(sitespecificdata$dateTested)
   #           ,ymin=12.8,ymax=17.8
   #           ,color=light,fill=light)+
-  # geom_point(aes(x=Date.Tested,y=Water.Temp),color=main) +
-  geom_point(aes(x=Date.Tested,y=Air.Temp),color=mid2) +
-  # geom_line(aes(x=Date.Tested,y=Water.Temp),color=main) +
-  geom_line(aes(x=Date.Tested,y=Air.Temp),color=mid2) +
-  # geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-  #            ,aes(x=Date.Tested+1,y=Water.Temp),color=main
+  # geom_point(aes(x=dateTested,y=waterTemp),color=main) +
+  geom_point(aes(x=dateTested,y=airTemp),color=mid2) +
+  # geom_line(aes(x=dateTested,y=waterTemp),color=main) +
+  geom_line(aes(x=dateTested,y=airTemp),color=mid2) +
+  # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
+  #            ,aes(x=dateTested+1,y=waterTemp),color=main
   #           ,label="Water temperature",hjust=0,size=textlabelsize) +
-  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-            ,aes(x=Date.Tested+1,y=Air.Temp),color=mid2
+  geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
+            ,aes(x=dateTested+1,y=airTemp),color=mid2
             ,label="Air temperature",hjust=0,size=textlabelsize) +
   scale_y_continuous(lim=c(0,27)) +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
@@ -247,14 +247,14 @@ temperature <-
 # Step 3e. pH graph
 phGraph <-
   sitespecificdata %>%
-    ggplot(aes(x=Date.Tested,y=pH)) +
+    ggplot(aes(x=dateTested,y=pH)) +
     coord_cartesian(clip="off") +
-    geom_rect(xmin=min(sitespecificdata$Date.Tested)
-              ,xmax=max(sitespecificdata$Date.Tested)
+    geom_rect(xmin=min(sitespecificdata$dateTested)
+              ,xmax=max(sitespecificdata$dateTested)
               ,ymin=6,ymax=8.5
               ,color=light,fill=light)+
-    geom_point(aes(x=Date.Tested,y=pH),color=main) +
-    geom_line(aes(x=Date.Tested,y=pH),color=main) +
+    geom_point(aes(x=dateTested,y=pH),color=main) +
+    geom_line(aes(x=dateTested,y=pH),color=main) +
     scale_y_continuous(lim=c(0,14),breaks=seq(0,14,1),labels=seq(0,14,1)) +
     scale_x_date(date_labels = "%b %y",date_breaks = "month") +
     ylab("pH") +
@@ -281,19 +281,19 @@ phGraph <-
 
 # Step 3f. Hardness & Alkalinity graph
 hAndAGraph <-   sitespecificdata %>%
-  ggplot(aes(x=Date.Tested,y=Total.Hardness)) +
+  ggplot(aes(x=dateTested,y=totalHardness)) +
   coord_cartesian(clip="off") +
-  geom_point(aes(x=Date.Tested,y=Total.Hardness),color=main) +
-  geom_point(aes(x=Date.Tested,y=Total.ALK),color=mid2) +
-  geom_line(aes(x=Date.Tested,y=Total.Hardness),color=main) +
-  geom_line(aes(x=Date.Tested,y=Total.ALK),color=mid2) +
-  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-            ,aes(x=Date.Tested+1,y=Total.Hardness),color=main
+  geom_point(aes(x=dateTested,y=totalHardness),color=main) +
+  geom_point(aes(x=dateTested,y=totalAlk),color=mid2) +
+  geom_line(aes(x=dateTested,y=totalHardness),color=main) +
+  geom_line(aes(x=dateTested,y=totalAlk),color=mid2) +
+  geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
+            ,aes(x=dateTested+1,y=totalHardness),color=main
             ,label="Total Hardness",hjust=0,size=textlabelsize) +
-  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-            ,aes(x=Date.Tested+1,y=Total.ALK),color=mid2
+  geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
+            ,aes(x=dateTested+1,y=totalAlk),color=mid2
             ,label="Total Alkalinity",hjust=0,size=textlabelsize) +
-  scale_y_continuous(lim=c(0,max(clean$Total.ALK,na.rm=T))) +
+  scale_y_continuous(lim=c(0,max(clean$totalAlk,na.rm=T))) +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
   ylab("mg/L") +
   labs(title=hardnessalkalinitytitle
@@ -318,12 +318,12 @@ hAndAGraph <-   sitespecificdata %>%
 
 # Step 3g. Bacteria levels
 bacteriaGraph <- sitespecificdata %>%
-  ggplot(aes(x=Date.Tested)) +
+  ggplot(aes(x=dateTested)) +
   coord_cartesian(clip="off") +
-  geom_point(aes(x=Date.Tested,y=`Avg..Coliform`/10),color=main) +
-  geom_line(aes(x=Date.Tested,y=`Avg..Coliform`/10),color=main) +
-  geom_point(aes(x=Date.Tested,y=`Avg..E..coli`),color=mid2) +
-  geom_line(aes(x=Date.Tested,y=`Avg..E..coli`),color=mid2) +
+  geom_point(aes(x=dateTested,y=avgColiform/10),color=main) +
+  geom_line(aes(x=dateTested,y=avgColiform/10),color=main) +
+  geom_point(aes(x=dateTested,y=avgEcoli),color=mid2) +
+  geom_line(aes(x=dateTested,y=avgEcoli),color=mid2) +
   scale_y_continuous(
     # Features of the first axis
     name = "Average E Coli",
@@ -358,28 +358,28 @@ bacteriaGraph <- sitespecificdata %>%
 
 # Step 3h. dissolved oxygen
 DOgraph <- sitespecificdata %>%
-  ggplot(aes(x=Date.Tested,y=Average.DO)) +
+  ggplot(aes(x=dateTested,y=averageDo)) +
   coord_cartesian(clip="off") +
-  geom_rect(xmin=min(sitespecificdata$Date.Tested)
-            ,xmax=max(sitespecificdata$Date.Tested)
+  geom_rect(xmin=min(sitespecificdata$dateTested)
+            ,xmax=max(sitespecificdata$dateTested)
             ,ymin=7,ymax=11
             ,color=light,fill=light)+
-  geom_point(aes(x=Date.Tested,y=Average.DO),color=main) +
-  #geom_point(aes(x=Date.Tested,y=`%.Ox..Sat.`),color=mid2) +
-  geom_point(aes(x=Date.Tested,y=Water.Temp),color=mid2) +
-  geom_line(aes(x=Date.Tested,y=Average.DO),color=main) +
-  #geom_line(aes(x=Date.Tested,y=`%.Ox..Sat.`),color=mid2) +
-  geom_line(aes(x=Date.Tested,y=Water.Temp),color=mid2) +
-  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-            ,aes(x=Date.Tested+1,y=Average.DO),color=main
+  geom_point(aes(x=dateTested,y=averageDo),color=main) +
+  #geom_point(aes(x=dateTested,y=OxSat),color=mid2) +
+  geom_point(aes(x=dateTested,y=waterTemp),color=mid2) +
+  geom_line(aes(x=dateTested,y=averageDo),color=main) +
+  #geom_line(aes(x=dateTested,y=OxSat),color=mid2) +
+  geom_line(aes(x=dateTested,y=waterTemp),color=mid2) +
+  geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
+            ,aes(x=dateTested+1,y=averageDo),color=main
             ,label="Average dissolved\noxygen",hjust=0,size=textlabelsize) +
-  # geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-  #           ,aes(x=Date.Tested+1,y=`%.Ox..Sat.`),color=mid2
+  # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
+  #           ,aes(x=dateTested+1,y=OxSat),color=mid2
   #           ,label="% oxygen saturation",hjust=0,size=textlabelsize) +
-  geom_text(data = sitespecificdata %>% filter(Date.Tested == max(Date.Tested))
-            ,aes(x=Date.Tested+1,y=Water.Temp),color=mid2
+  geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
+            ,aes(x=dateTested+1,y=waterTemp),color=mid2
             ,label="Water temperature",hjust=0,size=textlabelsize) +
-  scale_y_continuous(lim=c(0,max(clean$Average.DO,na.rm=T))) +
+  scale_y_continuous(lim=c(0,max(clean$averageDo,na.rm=T))) +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
   ylab("DO parts per million\nWater temperature (Celsius)") +
   labs(title=DOtitle
