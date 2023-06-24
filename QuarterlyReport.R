@@ -7,6 +7,8 @@
 rm(list=ls())
 
 # Change this each quarter
+  quarterName <- "2023Q2"
+  quarterNameLong <- "Q2 of 2023"
   quartermin <- "2023-04-01"
   quartermax <- "2023-06-30"
   previousquartermin <- "2023-01-01"
@@ -41,11 +43,10 @@ logo <- paste(directory,"CWCAPlogo-1-white-1024x346.png",sep="")
 
 ## Step 2: Bring in data and clean it
 clean <- read.csv(paste0(directory,"H20Data.csv"),stringsAsFactors = FALSE)
-clean$dateTested <-
 
   clean <- clean %>%
   # clean the date data
-  mutate(dateTested = as.Date(clean$dateTested)
+  mutate(dateTested = as.Date(dateTested)
   # Categorize the data into quarters
         ,quarter = case_when(quartermin <= dateTested & dateTested <= quartermax ~ "Current quarter"
                              ,previousquartermin <= dateTested & dateTested <=previousquartermax ~ "Previous quarter"
@@ -64,6 +65,9 @@ quarter <- clean %>%
   # Testing information
     # Number of tests
     qNumberoftests <- nrow(quarter)
+
+    # Number of tests with two people
+    qNumberoftestsinpairs <- nrow(quarter[quarter$numberofvolunteers == 2,])
 
   # Volunteer information
     # Number of unique volunteers
@@ -94,7 +98,7 @@ previousq <- clean %>%
     # Number of times each of them volunteered
     pqAveragetimesvolunteered <- pqNumberoftests/pqNumVols
 
-  # Change between quarters
+## Step 5. Change between quarters
     # Number of tests
       if (qNumberoftests < pqNumberoftests) {
         chNumberoftests <- paste0(pqNumberoftests-qNumberoftests
@@ -103,7 +107,7 @@ previousq <- clean %>%
         chNumberoftests <- paste0(qNumberoftests-pqNumberoftests
                                   ," more tests than")
       } else {
-        chNumberoftests <- " the same number of tests as "
+        chNumberoftests <- " the same number of tests as"
       }
 
     # Number of unique volunteers
@@ -114,7 +118,7 @@ previousq <- clean %>%
         chNumberofVols <- paste0(qNumVols-pqNumVols
                                   ," more volunteers than")
       } else {
-        chNumberofVols <- " the same number of volunteers as "
+        chNumberofVols <- " the same number of volunteers as"
       }
 
     # Number of volunteer hours
@@ -125,28 +129,46 @@ previousq <- clean %>%
         chVolHrs <- paste0(qVolTime-pqVolTime
                                  ," more hours than")
       } else {
-        chVolHrs <- " the same number of hours as "
+        chVolHrs <- " the same number of hours as"
       }
 
     # Avg number of times volunteered
       if (qAveragetimesvolunteered < pqAveragetimesvolunteered) {
-        chVolHrs <- paste0(pqAveragetimesvolunteered-qAveragetimesvolunteered
-                           ," fewer times on average than")
+        chAvgTimes <- paste0(pqAveragetimesvolunteered-qAveragetimesvolunteered
+                           ," fewer times on average")
       } else if (qAveragetimesvolunteered > pqAveragetimesvolunteered) {
-        chVolHrs <- paste0(qAveragetimesvolunteered-pqAveragetimesvolunteered
-                           ," more times on average than")
+        chAvgTimes <- paste0(qAveragetimesvolunteered-pqAveragetimesvolunteered
+                           ," more times on average")
       } else {
-        chVolHrs <- " the same number of times on average as "
+        chAvgTimes <- " the same number of times on average"
       }
 
-## Step 5. year to date
+## Step 6. year to date
 
 
 
 
 
 ### Writing
+intro <- str_glue("These data are for {quarterNameLong}. The eight sites were tested
+                  a total of {qNumberoftests} times by {qNumVols} unique
+                  volunteers (an average of {qAveragetimesvolunteered} times
+                  volunteered). Because many of the tests (
+                  {qNumberoftestsinpairs} out of {qNumberoftests}) were done by
+                  two people, this was about {qVolTime} hours of volunteer
+                  effort. Volunteers completed {chNumberoftests} (and
+                  volunteered {chVolHrs}) last quarter: {pqNumberoftests} tests
+                  and averaged {pqAveragetimesvolunteered} times volunteered.
+                  There were {chNumberofVols} last quarter.")
 
 
+pdf(file = paste(directory,"CarkeekWatershedTesting",quarterName,".pdf",sep="")
+    ,paper="letter",width=8,height=11)
+
+clean %>%
+  ggplot(aes(x=dateTested,y=averageDo)) +
+  theme_nothing() +
+  labs(title=str_wrap(intro,90))
 
 
+dev.off()
