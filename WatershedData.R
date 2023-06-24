@@ -374,7 +374,7 @@ ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
 
 ## Step 4: loop through the sites and print the PDFs
 
-for (sitechosen in 1:8) {
+for (sitechosen in seq(1,8,1)) {
 
   pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
       ,paper="letter",width=8,height=11)
