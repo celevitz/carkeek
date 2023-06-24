@@ -374,7 +374,7 @@ DOgraph <- sitespecificdata %>%
             ,aes(x=dateTested+1,y=averageDo),color=main
             ,label="Average dissolved\noxygen",hjust=0,size=textlabelsize) +
   # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-  #           ,aes(x=dateTested+1,y=OxSat),color=mid2
+  #           ,aes(x=dateTested,y=OxSat),color=mid2
   #           ,label="% oxygen saturation",hjust=0,size=textlabelsize) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
             ,aes(x=dateTested+1,y=waterTemp),color=mid2
