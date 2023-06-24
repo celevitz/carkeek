@@ -250,10 +250,10 @@ temperature <-
   sitespecificdata %>%
   ggplot(aes(x=Date.Tested,y=Water.Temp)) +
   coord_cartesian(clip="off") +
-  geom_rect(xmin=min(sitespecificdata$Date.Tested)
-            ,xmax=max(sitespecificdata$Date.Tested)
-            ,ymin=12.8,ymax=17.8
-            ,color=light,fill=light)+
+  # geom_rect(xmin=min(sitespecificdata$Date.Tested)
+  #           ,xmax=max(sitespecificdata$Date.Tested)
+  #           ,ymin=12.8,ymax=17.8
+  #           ,color=light,fill=light)+
   # geom_point(aes(x=Date.Tested,y=Water.Temp),color=main) +
   geom_point(aes(x=Date.Tested,y=Air.Temp),color=mid2) +
   # geom_line(aes(x=Date.Tested,y=Water.Temp),color=main) +
