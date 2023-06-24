@@ -62,7 +62,7 @@ for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
 }
 
 ## rename the data
-names(clean) <- c("id","siteNumber","tester1","tester2","dateTested","month"
+names(clean) <- c("siteNumber","tester1","tester2","dateTested","month"
                   ,"timeTested","isThereASiteNumber","isThereATester"
                   ,"isTheDateAppropriate","exclude","siteDateId","year"
                   ,"previousYear","monthCalculated","previousMonth","watershed"
