@@ -19,9 +19,10 @@ library(ggpubr)
 library(ggimage)
 library(showtext)
 
-font_add_google("Roboto", "Roboto")
-ft <- "Roboto"
+font_add_google("Barlow", "bar")
 showtext_auto()
+ft <- "bar"
+
 
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
@@ -100,7 +101,7 @@ DOsubtitle <- str_wrap(str_glue("Water temperature can affect the breeding and
                         higher temperatures."),65)
 
 bacteriaTitle <- str_wrap("Bacteria levels",40)
-bacteriaSubtitle <- str_wrap(str_glue("E Coli & Coliform"),65)
+bacteriaSubtitle <- str_wrap(str_glue("E Coli"),65)
 
 sitepdf <- function(sitechosen) {
 
@@ -328,17 +329,9 @@ hAndAGraph <-   sitespecificdata %>%
 bacteriaGraph <- sitespecificdata %>%
   ggplot(aes(x=dateTested)) +
   coord_cartesian(clip="off") +
-  geom_point(aes(x=dateTested,y=avgColiform/10),color=main) +
-  geom_line(aes(x=dateTested,y=avgColiform/10),color=main) +
   geom_point(aes(x=dateTested,y=avgEcoli),color=mid2) +
   geom_line(aes(x=dateTested,y=avgEcoli),color=mid2) +
-  scale_y_continuous(
-    # Features of the first axis
-    name = "Average E Coli",
-    # Add a second axis and specify its features
-    sec.axis = sec_axis(~., name="Average Coliform"
-                        ,breaks=seq(0,25,5)
-                        ,label=seq(0,250,50))  ) +
+  scale_y_continuous(name = "Average E Coli") +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
   labs(title=bacteriaTitle,subtitle=bacteriaSubtitle) +
   theme_minimal() +
@@ -423,7 +416,7 @@ ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
 for (sitechosen in seq(1,8,1)) {
 
   pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
-      ,paper="letter",width=8,height=11,family=ft)
+      ,paper="letter",width=8,height=11)
 
   sitepdf(sitechosen)
 
