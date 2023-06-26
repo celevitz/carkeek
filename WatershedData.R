@@ -216,17 +216,8 @@ temperature <-
   sitespecificdata %>%
   ggplot(aes(x=dateTested,y=waterTemp)) +
   coord_cartesian(clip="off") +
-  # geom_rect(xmin=min(sitespecificdata$dateTested)
-  #           ,xmax=max(sitespecificdata$dateTested)
-  #           ,ymin=12.8,ymax=17.8
-  #           ,color=light,fill=light)+
-  # geom_point(aes(x=dateTested+1,y=waterTemp),color=main) +
   geom_point(aes(x=dateTested,y=airTemp),color=mid2) +
-  # geom_line(aes(x=dateTested+1,y=waterTemp),color=main) +
   geom_line(aes(x=dateTested,y=airTemp),color=mid2) +
-  # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-  #            ,aes(x=dateTested+1,y=waterTemp,family=ft),color=main
-  #           ,label="Water temperature",hjust=0,size=textlabelsize) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
             ,aes(x=dateTested+1,y=airTemp,family=ft),color=mid2
             ,label="Air temperature",hjust=0,size=textlabelsize) +
@@ -329,8 +320,8 @@ hAndAGraph <-   sitespecificdata %>%
 bacteriaGraph <- sitespecificdata %>%
   ggplot(aes(x=dateTested)) +
   coord_cartesian(clip="off") +
-  geom_point(aes(x=dateTested,y=avgEcoli),color=mid2) +
-  geom_line(aes(x=dateTested,y=avgEcoli),color=mid2) +
+  geom_point(aes(x=dateTested,y=avgEcoli),color=main) +
+  geom_line(aes(x=dateTested,y=avgEcoli),color=main) +
   scale_y_continuous(name = "Average E Coli") +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
   labs(title=bacteriaTitle,subtitle=bacteriaSubtitle) +
@@ -366,17 +357,12 @@ DOgraph <- sitespecificdata %>%
             ,ymin=7,ymax=11
             ,color=light,fill=light)+
   geom_point(aes(x=dateTested,y=averageDo),color=main) +
-  #geom_point(aes(x=dateTested,y=OxSat),color=mid2) +
   geom_point(aes(x=dateTested,y=waterTemp),color=mid2) +
   geom_line(aes(x=dateTested,y=averageDo),color=main) +
-  #geom_line(aes(x=dateTested,y=OxSat),color=mid2) +
   geom_line(aes(x=dateTested,y=waterTemp),color=mid2) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
             ,aes(x=dateTested+1,y=averageDo,family=ft),color=main
             ,label="Average dissolved\noxygen",hjust=0,size=textlabelsize) +
-  # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-  #           ,aes(x=dateTested,y=OxSat,family=ft),color=mid2
-  #           ,label="% oxygen saturation",hjust=0,size=textlabelsize) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
             ,aes(x=dateTested+1,y=waterTemp,family=ft),color=mid2
             ,label="Water temperature",hjust=0,size=textlabelsize) +
