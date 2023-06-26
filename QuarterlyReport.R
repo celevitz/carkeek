@@ -8,6 +8,7 @@ rm(list=ls())
 
 # Change this each quarter
   quarterName <- "2023Q2"
+  quarterNameMid <- "Q2 2023"
   quarterNameLong <- "Q2 of 2023"
   quartermin <- "2023-04-01"
   quartermax <- "2023-06-30"
@@ -28,6 +29,11 @@ library(ggtext)
 library(stringr)
 library(ggpubr)
 library(ggimage)
+library(showtext)
+
+font_add_google("Barlow", "bar")
+showtext_auto()
+ft <- "bar"
 
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
@@ -38,6 +44,10 @@ mid <- "#9c8b94"
 main <- "#7e7b3e"
 light <- "#f0e0cc"
 highlight <- "#46bdc6"
+
+titlesize <- 20
+subtitlesize <- 12
+textsize <- 8
 
 logo <- paste(directory,"CWCAPlogo-1-white-1024x346.png",sep="")
 
@@ -86,6 +96,9 @@ previousq <- clean %>%
   # Testing information
     # Number of tests
     pqNumberoftests <- nrow(previousq)
+
+    # Number of tests with two people
+    pqNumberoftestsinpairs <- nrow(previousq[previousq$numberofvolunteers==2,])
 
   # Volunteer information
     # Number of unique volunteers
@@ -149,7 +162,7 @@ previousq <- clean %>%
 
 
 
-### Writing
+### Step 7. Writing
 intro <- str_glue("These data are for {quarterNameLong}. The eight sites were tested
                   a total of {qNumberoftests} times by {qNumVols} unique
                   volunteers (an average of {qAveragetimesvolunteered} times
@@ -157,18 +170,212 @@ intro <- str_glue("These data are for {quarterNameLong}. The eight sites were te
                   {qNumberoftestsinpairs} out of {qNumberoftests}) were done by
                   two people, this was about {qVolTime} hours of volunteer
                   effort. Volunteers completed {chNumberoftests} (and
-                  volunteered {chVolHrs}) last quarter: {pqNumberoftests} tests
-                  and averaged {pqAveragetimesvolunteered} times volunteered.
-                  There were {chNumberofVols} last quarter.")
+                  volunteered {chVolHrs}) last quarter, which was
+                  {pqNumberoftests} tests and an average of
+                  {pqAveragetimesvolunteered} times volunteered. There were
+                  {chNumberofVols} last quarter.")
+
+# clean %>%
+#   ggplot(aes(x=dateTested,y=averageDo)) +
+#   theme_nothing() +
+#   labs(title=str_wrap(intro,90)) +
+#   theme(plot.title = element_text(family=ft)
+#         ,plot.margin = margin(10,10,10,30))
+
+### Step 8. Quarterly dashboard
+## Step 8a. Header
+header <- clean %>%
+  ggplot(aes(x=dateTested,y=averageDo)) +
+  theme_nothing() +
+  geom_image(aes(x=1,y=1,image=logo),size=2.2) +
+  theme(panel.grid = element_blank()
+        ,panel.background = element_rect(color=main,fill=main)
+        ,plot.background = element_rect(color=main,fill=main) )
+
+## Step 8b. Header part 2
+header2 <- clean %>%
+  ggplot(aes(x=dateTested,y=averageDo)) +
+  theme_nothing() +
+  labs(title=quarterNameMid) +
+  theme(panel.grid = element_blank()
+        ,panel.background = element_rect(color=main,fill=main)
+        ,plot.background = element_rect(color=main,fill=main)
+        ,plot.title = element_text(color="white",family=ft,hjust=.5,face="bold"
+                                   ,size = 32,margin=margin(30,0,0,0)))
+
+## Step 8c. Times tested
+  timestestedA <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=titlesize
+              ,label=str_glue("{qNumberoftests}")) +
+    theme_nothing()
+
+  timestestedB <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=subtitlesize
+              ,label=str_glue("tests")) +
+    theme_nothing()
+
+  timestestedC_temp <- previousq %>%
+    ggplot(aes(x=1,y=1)) +
+    theme_nothing()
+
+  timestestedC <-
+    if (qNumberoftests < pqNumberoftests) {
+      timestestedC_temp +
+      geom_point(aes(x=1,y=1),pch=25,color=mid,fill=mid,size=10) +
+      geom_text(aes(x=1,y=1,family=ft),color=mid,size=textsize,hjust=1
+                ,label=paste0("-",pqNumberoftests-qNumberoftests)
+               # ,nudge_x = .01
+               )
+    } else if (qNumberoftests > pqNumberoftests) {
+      timestestedC_temp +
+      geom_point(aes(x=1,y=1),pch=24,color=main,fill=main,size=10) +
+      geom_text(aes(x=1,y=1,family=ft),color=main,size=textsize,hjust=1
+                ,label=paste0("+",qNumberoftests-pqNumberoftests)
+                #,nudge_x = .01
+                )
+    } else {
+      timestestedC_temp +
+      geom_point(aes(x=1,y=1),pch=20,color=mid2,fill=mid2,size=10)+
+      geom_text(aes(x=1,y=1,family=ft),color=main,size=textsize,hjust=1
+                #,nudge_x = .01
+                ,label="+0")
+    }
+
+  # timestestedD <- previousq %>%
+  #   ggplot(aes(x=1,y=1)) +
+  #   theme_nothing() +
+  #   if (qNumberoftests < pqNumberoftests) {
+  #     geom_text(aes(x=1,y=1,family=ft),color=mid,size=textsize
+  #               ,label=paste0("-",pqNumberoftests-qNumberoftests))
+  #   } else if (qNumberoftests > pqNumberoftests) {
+  #     geom_text(aes(x=1,y=1,family=ft),color=dark,size=textsize
+  #               ,label=paste0("+",qNumberoftests-pqNumberoftests))
+  #   } else {
+  #     geom_text(aes(x=1,y=1,family=ft),color=main,size=textsize
+  #               ,label="+0")
+  #   }
+
+  timestested <- ggarrange(timestestedA,timestestedB
+                           ,timestestedC
+                           #,ggarrange(timestestedC,timestestedD,nrow=1,ncol=2)
+                           ,nrow=1,ncol=3)
+
+## Step 8d. Number of tests with two people
+  testswith2A <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=titlesize
+              ,label=str_glue("{round(qNumberoftestsinpairs/qNumberoftests*100
+                              ,1)}%")) +
+    theme_nothing()
+
+  testswith2B <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=subtitlesize
+              ,label=str_glue("done with\na partner")) +
+    theme_nothing()
+
+  testswith2C_temp <- previousq %>%
+    ggplot(aes(x=1,y=1)) +
+    theme_nothing()
+
+  testswith2C <-
+    if (qNumberoftestsinpairs/qNumberoftests < pqNumberoftestsinpairs/pqNumberoftests) {
+      testswith2C_temp +
+      geom_point(aes(x=1,y=1),pch=25,color=mid,fill=mid,size=10) +
+      geom_text(aes(x=1,y=1,family=ft),color=mid,size=textsize,hjust=1
+                ,label=paste0("-",round((pqNumberoftestsinpairs/pqNumberoftests-qNumberoftestsinpairs/qNumberoftests)*100,1)
+                              ,"%"))
+    } else if (qNumberoftestsinpairs/qNumberoftests > pqNumberoftestsinpairs/pqNumberoftests) {
+      testswith2C_temp +
+      geom_point(aes(x=1,y=1),pch=24,color=main,fill=main,size=10) +
+      geom_text(aes(x=1,y=1,family=ft),color=main,size=textsize,hjust=1
+                ,label=paste0("+",round((qNumberoftestsinpairs/qNumberoftests-pqNumberoftestsinpairs/pqNumberoftests)*100,1)
+                              ,"%"))
+    } else {
+      testswith2C_temp +
+      geom_point(aes(x=1,y=1),pch=20,color=mid2,fill=mid2,size=10) +
+      geom_text(aes(x=1,y=1,family=ft),color=mid2,size=textsize,hjust=1
+                ,label="+0")
+    }
+
+  testswith2graph <- ggarrange(testswith2A,testswith2B,testswith2C
+                               ,nrow=1,ncol=3)
 
 
+## Step 8e. Number of volunteers
+  numvolsA <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=titlesize
+              ,label=str_glue("{qNumVols}")) +
+    theme_nothing()
+
+  numvolsB <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=subtitlesize
+              ,label=str_glue("unique\nvolunteers")) +
+    theme_nothing()
+
+  numvolsC_temp <- previousq %>%
+    ggplot(aes(x=1,y=1)) +
+    theme_nothing()
+
+  numvolsC <-
+    if (qNumVols < pqNumVols) {
+      numvolsC_temp+
+      geom_point(aes(x=1,y=1),pch=25,color=mid,fill=mid,size=10)
+    } else if (qNumVols > pqNumVols) {
+      numvolsC_temp+
+      geom_point(aes(x=1,y=1),pch=24,color=main,fill=main,size=10)
+    } else {
+      numvolsC_temp+
+      geom_point(aes(x=1,y=1),pch=20,color=mid2,fill=mid2,size=10)
+    }
+
+  numvolsgraph <- ggarrange(numvolsA,numvolsB,numvolsC,nrow=1,ncol=3)
+
+## Step 8f. Number of hours by volunteers this quarters
+  numHrsA <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=titlesize
+              ,label=str_glue("{qVolTime}")) +
+    theme_nothing()
+
+  numHrsB <- quarter %>%
+    ggplot(aes(x=1,y=1)) +
+    geom_text(aes(x=1,y=1,family=ft),color=dark,size=subtitlesize
+              ,label=str_glue("hours")) +
+    theme_nothing()
+
+  numHrsC_temp <- previousq %>%
+    ggplot(aes(x=1,y=1)) +
+    theme_nothing()
+
+  numHrsC <-
+    if (qVolTime < pqVolTime) {
+      numHrsC_temp+
+      geom_point(aes(x=1,y=1),pch=25,color=mid,fill=mid,size=10)
+    } else if (qVolTime > pqVolTime) {
+      numHrsC_temp+
+      geom_point(aes(x=1,y=1),pch=24,color=main,fill=main,size=10)
+    } else {
+      numHrsC_temp+
+      geom_point(aes(x=1,y=1),pch=20,color=mid2,fill=mid2,size=10)
+    }
+
+  numHrsGraph <- ggarrange(numHrsA,numHrsB,numHrsC,nrow=1,ncol=3)
+
+## Step 8g. Bring together
 pdf(file = paste(directory,"CarkeekWatershedTesting",quarterName,".pdf",sep="")
     ,paper="letter",width=8,height=11)
 
-clean %>%
-  ggplot(aes(x=dateTested,y=averageDo)) +
-  theme_nothing() +
-  labs(title=str_wrap(intro,90))
-
-
+ggarrange(ggarrange(header,header2,ncol=2,nrow=2,widths=c(2,1))
+        ,timestested
+        ,testswith2graph
+        ,numvolsgraph
+        ,numHrsGraph
+        ,nrow=5,ncol=1
+)
 dev.off()
+
