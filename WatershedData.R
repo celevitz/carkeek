@@ -17,6 +17,11 @@ library(ggtext)
 library(stringr)
 library(ggpubr)
 library(ggimage)
+library(showtext)
+
+font_add_google("Roboto", "Roboto")
+ft <- "Roboto"
+showtext_auto()
 
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
@@ -170,13 +175,13 @@ firstgraphA <-
         ,axis.line = element_blank()
         ,axis.ticks = element_blank()
         ,axis.title = element_blank()
-        ,plot.title = element_markdown(size=titlesize,face="bold"
+        ,plot.title = element_markdown(size=titlesize,face="bold",family=ft
                                        ,margin=margin(t=titlemarginT
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL))
-        ,plot.subtitle = element_markdown(size=subtitlesize)
-        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.subtitle = element_markdown(size=subtitlesize,family=ft)
+        ,plot.caption = element_markdown(size=captionsize,family=ft)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
@@ -193,15 +198,15 @@ firstgraphB <-
         ,axis.line = element_blank()
         ,axis.ticks = element_blank()
         ,axis.title = element_blank()
-        ,plot.title = element_text(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold",family=ft
                                        ,margin=margin(t=titlemarginT
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL)
                                        ,hjust=0,color=main)
-        ,plot.subtitle = element_text(size=subtitlesize
+        ,plot.subtitle = element_text(size=subtitlesize,family=ft
                                           ,hjust=0,color=mid2)
-        ,plot.caption = element_markdown(size=captionsize,color=mid2)
+        ,plot.caption = element_markdown(size=captionsize,color=mid2,family=ft)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
@@ -219,10 +224,10 @@ temperature <-
   # geom_line(aes(x=dateTested+1,y=waterTemp),color=main) +
   geom_line(aes(x=dateTested,y=airTemp),color=mid2) +
   # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-  #            ,aes(x=dateTested+1,y=waterTemp),color=main
+  #            ,aes(x=dateTested+1,y=waterTemp,family=ft),color=main
   #           ,label="Water temperature",hjust=0,size=textlabelsize) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-            ,aes(x=dateTested+1,y=airTemp),color=mid2
+            ,aes(x=dateTested+1,y=airTemp,family=ft),color=mid2
             ,label="Air temperature",hjust=0,size=textlabelsize) +
   scale_y_continuous(lim=c(0,27)) +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
@@ -233,17 +238,17 @@ temperature <-
   theme(panel.grid = element_blank()
         ,panel.background = element_blank()
         ,plot.background = element_blank()
-        ,axis.text = element_markdown(size=axissize)
+        ,axis.text = element_text(size=axissize,family=ft)
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
-        ,plot.title = element_text(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold",family=ft
                                        ,margin=margin(t=titlemarginT
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL))
-        ,plot.subtitle = element_text(size=subtitlesize)
-        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.subtitle = element_text(size=subtitlesize,family=ft)
+        ,plot.caption = element_text(size=captionsize,family=ft)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
@@ -267,18 +272,18 @@ phGraph <-
     theme(panel.grid = element_blank()
           ,panel.background = element_blank()
           ,plot.background = element_blank()
-          ,axis.text = element_markdown(size=axissize)
+          ,axis.text = element_text(size=axissize,family=ft)
           ,axis.title.x = element_blank()
           ,axis.line.y = element_line(color=dark)
           ,axis.ticks.y = element_line(color=dark)
           ,plot.title = element_text(size=titlesize
-                                         ,face="bold"
+                                         ,face="bold",family=ft
                                          ,margin=margin(t=titlemarginT
                                                         ,r=titlemarginR
                                                         ,b=titlemarginB
                                                         ,l=titlemarginL))
-          ,plot.subtitle = element_text(size=subtitlesize)
-          ,plot.caption = element_markdown(size=captionsize)
+          ,plot.subtitle = element_text(size=subtitlesize,family=ft)
+          ,plot.caption = element_markdown(size=captionsize,family=ft)
           ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                                 ,l=plotmarginL))
 
@@ -291,10 +296,10 @@ hAndAGraph <-   sitespecificdata %>%
   geom_line(aes(x=dateTested,y=totalHardness),color=main) +
   geom_line(aes(x=dateTested,y=totalAlk),color=mid2) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-            ,aes(x=dateTested+1,y=totalHardness),color=main
+            ,aes(x=dateTested+1,y=totalHardness,family=ft),color=main
             ,label="Total Hardness",hjust=0,size=textlabelsize) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-            ,aes(x=dateTested+1,y=totalAlk),color=mid2
+            ,aes(x=dateTested+1,y=totalAlk,family=ft),color=mid2
             ,label="Total Alkalinity",hjust=0,size=textlabelsize) +
   scale_y_continuous(lim=c(0,max(clean$totalAlk,na.rm=T))) +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
@@ -305,17 +310,17 @@ hAndAGraph <-   sitespecificdata %>%
   theme(panel.grid = element_blank()
         ,panel.background = element_blank()
         ,plot.background = element_blank()
-        ,axis.text = element_markdown(size=axissize)
+        ,axis.text = element_text(size=axissize,family=ft)
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
-        ,plot.title = element_text(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold",family=ft
                                        ,margin=margin(t=titlemarginT
                                                       ,r=titlemarginR
                                                       ,b=titlemarginB
                                                       ,l=titlemarginL))
-        ,plot.subtitle = element_text(size=subtitlesize)
-        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.subtitle = element_text(size=subtitlesize,family=ft)
+        ,plot.caption = element_markdown(size=captionsize,family=ft)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
@@ -341,20 +346,20 @@ bacteriaGraph <- sitespecificdata %>%
         ,panel.background = element_blank()
         ,plot.background = element_blank()
         ,axis.title.x = element_blank()
-        ,axis.text = element_markdown(size=axissize)
+        ,axis.text = element_text(size=axissize,family=ft)
         ,axis.line.y.left = element_line(color=dark)
         ,axis.ticks.y.left = element_line(color=dark)
         ,axis.title.y.left = element_text(color=main)
         ,axis.title.y.right = element_text(color=mid2)
         ,axis.line.y.right = element_line(color=mid2)
         ,axis.ticks.y.right = element_line(color=mid2)
-        ,plot.title = element_text(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold",family=ft
                                    ,margin=margin(t=titlemarginT
                                                   ,r=titlemarginR
                                                   ,b=titlemarginB
                                                   ,l=titlemarginL))
-        ,plot.subtitle = element_text(size=subtitlesize)
-        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.subtitle = element_text(size=subtitlesize,family=ft)
+        ,plot.caption = element_markdown(size=captionsize,family=ft)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
@@ -374,13 +379,13 @@ DOgraph <- sitespecificdata %>%
   #geom_line(aes(x=dateTested,y=OxSat),color=mid2) +
   geom_line(aes(x=dateTested,y=waterTemp),color=mid2) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-            ,aes(x=dateTested+1,y=averageDo),color=main
+            ,aes(x=dateTested+1,y=averageDo,family=ft),color=main
             ,label="Average dissolved\noxygen",hjust=0,size=textlabelsize) +
   # geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-  #           ,aes(x=dateTested,y=OxSat),color=mid2
+  #           ,aes(x=dateTested,y=OxSat,family=ft),color=mid2
   #           ,label="% oxygen saturation",hjust=0,size=textlabelsize) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
-            ,aes(x=dateTested+1,y=waterTemp),color=mid2
+            ,aes(x=dateTested+1,y=waterTemp,family=ft),color=mid2
             ,label="Water temperature",hjust=0,size=textlabelsize) +
   scale_y_continuous(lim=c(0,max(clean$averageDo,na.rm=T))) +
   scale_x_date(date_labels = "%b %y",date_breaks = "month") +
@@ -391,17 +396,17 @@ DOgraph <- sitespecificdata %>%
   theme(panel.grid = element_blank()
         ,panel.background = element_blank()
         ,plot.background = element_blank()
-        ,axis.text = element_markdown(size=axissize)
+        ,axis.text = element_text(size=axissize,family=ft)
         ,axis.line.y = element_line(color=dark)
         ,axis.ticks.y = element_line(color=dark)
         ,axis.title.x = element_blank()
-        ,plot.title = element_text(size=titlesize,face="bold"
+        ,plot.title = element_text(size=titlesize,face="bold",family=ft
                                    ,margin=margin(t=titlemarginT
                                                   ,r=titlemarginR
                                                   ,b=titlemarginB
                                                   ,l=titlemarginL))
-        ,plot.subtitle = element_text(size=subtitlesize)
-        ,plot.caption = element_markdown(size=captionsize)
+        ,plot.subtitle = element_text(size=subtitlesize,family=ft)
+        ,plot.caption = element_markdown(size=captionsize,family=ft)
         ,plot.margin = margin(t=plotmarginT,r=plotmarginR,b=plotmarginB
                               ,l=plotmarginL))
 
@@ -418,7 +423,7 @@ ggarrange(ggarrange(firstgraphA,firstgraphB,ncol=1,nrow=2),temperature
 for (sitechosen in seq(1,8,1)) {
 
   pdf(file = paste(directory,"Site",sitechosen,"_OnePager.pdf",sep="")
-      ,paper="letter",width=8,height=11)
+      ,paper="letter",width=8,height=11,family=ft)
 
   sitepdf(sitechosen)
 
