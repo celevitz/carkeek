@@ -245,21 +245,42 @@ ytddata <- clean %>%
                                    turbidity was missing {missingTurb}, and
                                    E Coli was missing {missingEcoli}."),105)
 
+  ## Add the description to the dataframe in case it makes it print more
+  ## nicely than simple using geom_text
+    db <- db %>%
+      mutate(current = as.character(current)
+             ,previous = as.character(previous)
+             ,y = as.character(y)
+             ) %>%
+      bind_rows( as.data.frame(matrix(c("description",description,NA,NA,-3)
+                    ,ncol=5,byrow = TRUE
+                    ,dimnames=list(NULL,c("measure","current","previous"
+                                          ,"ytd","y"))))) %>%
+      mutate(previous = as.numeric(previous)
+             ,y = as.numeric(y))
+
+
+
 ### Step 9. Graph
   dashboard <-
   db %>%
     ggplot(aes(x=0,y=y)) +
-    geom_text(aes(x=0,y=y,label = measure),hjust=0,family = ft,color=dark) +
+    geom_text(data=db %>% filter(measure != "description")
+              ,aes(x=0,y=y,label = measure),hjust=0,family = ft,color=dark) +
     # numbers
-      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs" &
+                                     measure != "description")
                 ,aes(x=20,y=y,label = current),hjust=0,family = ft,color=dark) +
-      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs" &
+                                     measure != "description")
                 ,aes(x=30,y=y,label = previous),hjust=0,family = ft
                 ,color=dark) +
-      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs" &
+                                     measure != "description")
                 ,aes(x=41,y=y,label = quarterlyChange),hjust=0,family = ft
                 ,color=dark) +
-      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs" &
+                                     measure != "description")
                 ,aes(x=51,y=y,label = ytd),hjust=0,family = ft,color=dark) +
     # percents
       geom_text(data=db %>% filter(measure == "% of tests done in pairs")
@@ -276,9 +297,9 @@ ytddata <- clean %>%
                 ,family = ft,color=dark) +
     # instead of having x axis, plot the x axis as text
     # this way, I can plot other things ABOVE the x axis labels
-    geom_text(aes(x=c(0,20,30,40,50),y = rep(6,5)
+    geom_text(aes(x=c(0,20,30,40,50,60),y = c(rep(6,6)))
                   ,label = c("Measure","Current\nquarter","Previous\nquarter"
-                              ,"Change since\nlast quarter","Year-to-date") )
+                              ,"Change since\nlast quarter","Year-to-date","")
               ,family = ft, size = 4, color = dark,hjust=0) +
     coord_cartesian(clip = "off") +
     # then add the logo and title
@@ -299,8 +320,8 @@ ytddata <- clean %>%
     scale_color_manual(values=c(mid,mid2,main)) +
     scale_fill_manual(values=c(mid,mid2,main)) +
     # Add some text/description
-    geom_text(aes(x=0,y=-3),label=description,family = ft
-              , color = dark,hjust=0) +
+    geom_text(data=db %>% filter(measure == "description")
+             ,aes(x=0,y=y,label = current),hjust=0,family = ft,color=dark) +
     theme_minimal()+
     theme(panel.grid = element_blank()
           ,axis.title = element_blank()
