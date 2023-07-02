@@ -159,6 +159,7 @@ ytddata <- clean %>%
   db <- db %>%
     mutate(current = as.numeric(current)
            ,previous = as.numeric(previous)
+           ,y = as.numeric(y)
           ,quarterlyChange = current-previous
           ,directionofchange = case_when(quarterlyChange < 0 ~ "negative"
                                          ,quarterlyChange == 0 ~ "no change"
@@ -193,54 +194,40 @@ ytddata <- clean %>%
       geom_text(data=db %>% filter(measure == "% of tests done in pairs")
                 ,aes(x=51,y=y,label = paste0(ytd,"%")),hjust=0
                 ,family = ft,color=dark) +
+    # instead of having x axis, plot the x axis as text
+    # this way, I can plot other things ABOVE the x axis labels
+    geom_text(aes(x=c(0,20,30,40,50),y = rep(6,5)
+                  ,label = c("Measure","Current\nquarter","Previous\nquarter"
+                              ,"Change since\nlast quarter","Year-to-date") )
+              ,family = ft, size = 4, color = dark,hjust=0) +
+    coord_cartesian(clip = "off") +
+    # then add the logo and title
+    scale_y_continuous(lim=c(0,10))+
+    geom_rect(aes(xmin=0,xmax=60,ymin=7,ymax=10),color = main,fill = main) +
+    geom_image(aes(x=30,y=9,image=logo),size=.5) +
+    geom_text(aes(x=30,y=7.5),hjust=.5,size=8,color = "white",family = ft
+              ,label=paste0("Quarterly report for ",quarterNameMid)) +
     # other graph stuff
-    geom_vline(xintercept = 46,color=dark) +
+    # instead of using geom_vline, I'm going to just make a line that only
+    # is within the table
+    geom_rect(aes(xmin=49,xmax=49,ymin=.8,ymax=6.2),color=dark,fill=dark)+
+    geom_rect(aes(xmin=0,xmax=60,ymin=5.6,ymax=5.6),color=dark,fill=dark)+
     geom_point(aes(x=40,y=y,shape = directionofchange,color=directionofchange
                    ,fill = directionofchange),size=3) +
     scale_shape_manual(values = c(25,20,24)) +
     scale_color_manual(values=c(mid,mid2,main)) +
     scale_fill_manual(values=c(mid,mid2,main)) +
-    scale_x_continuous(lim=c(0,60),breaks=c(0,20,30,40,50)
-                       ,labels=c("Measure","Current quarter","Previous quarter"
-                                ,"Change since\nlast quarter","Year-to-date")
-                       ,position = "top")+
     theme_minimal()+
     theme(panel.grid = element_blank()
           ,axis.title = element_blank()
-          ,axis.text.y = element_blank()
-          ,axis.text.x = element_text(family = ft,face = "bold",size=10)
+          ,axis.text = element_blank()
           ,legend.position = "none" )
-
-
-### Step 8. Quarterly dashboard
-## Step 8a. Header
-header <- clean %>%
-  ggplot(aes(x=dateTested,y=averageDo)) +
-  theme_nothing() +
-  geom_image(aes(x=1,y=1,image=logo),size=2.2) +
-  theme(panel.grid = element_blank()
-        ,panel.background = element_rect(color=main,fill=main)
-        ,plot.background = element_rect(color=main,fill=main) )
-
-## Header part 2
-header2 <- clean %>%
-  ggplot(aes(x=dateTested,y=averageDo)) +
-  theme_nothing() +
-  labs(title=quarterNameMid) +
-  theme(panel.grid = element_blank()
-        ,panel.background = element_rect(color=main,fill=main)
-        ,plot.background = element_rect(color=main,fill=main)
-        ,plot.title = element_text(color="white",family=ft,hjust=.5,face="bold"
-                                   ,size = 32,margin=margin(30,0,0,0)))
-
 
 ## Step 8g. Bring together
 pdf(file = paste(directory,"CarkeekWatershedTesting",quarterName,".pdf",sep="")
     ,paper="letter",width=8,height=11)
 
-ggarrange(ggarrange(header,header2,ncol=2,nrow=2,widths=c(2,1))
-        ,dashboard
-        ,nrow=2,ncol=1
-)
+  dashboard
+
 dev.off()
 
