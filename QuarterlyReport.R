@@ -165,7 +165,87 @@ ytddata <- clean %>%
                                          ,quarterlyChange == 0 ~ "no change"
                                          ,quarterlyChange > 0 ~ "positive"))
 
-### Step 8. Graph
+### Step 8. Write a description
+  # How many times was each site tested?
+    numberoftestsbysite <- quarter %>%
+      group_by(siteNumber) %>%
+      summarise(n=n())
+
+    twotestsinquarter <-
+      paste("Site",numberoftestsbysite$siteNumber[numberoftestsbysite$n == 2]
+            ,sep=" ")
+    numberofonetests <- nrow(numberoftestsbysite[numberoftestsbysite$n == 1,])
+      if (numberofonetests == 1) { onetestsPlural <- "1 site was"} else {
+        onetestsPlural <- paste(numberofonetests,"sites were",sep=" ")
+      }
+    numberoftwotests <- nrow(numberoftestsbysite[numberoftestsbysite$n == 2,])
+      if (numberoftwotests == 1) { twotestsPlural <- "1 site was"} else {
+        twotestsPlural <- paste(numberoftwotests,"sites were",sep=" ")
+      }
+    numberofthreetests <- nrow(numberoftestsbysite[numberoftestsbysite$n == 3,])
+      if (numberofthreetests == 1) { threetestsPlural <- "1 site was"} else {
+        threetestsPlural <- paste(numberofthreetests,"sites were",sep=" ")
+      }
+    numberoffourtests <- nrow(numberoftestsbysite[numberoftestsbysite$n == 4,])
+      if (numberoffourtests == 1) { fourtestsPlural <- "1 site was"} else {
+        fourtestsPlural <- paste(numberoffourtests,"sites were",sep=" ")
+      }
+    numberoffivetests <- nrow(numberoftestsbysite[numberoftestsbysite$n > 4,])
+      if (numberoffivetests == 1) { fourtestsPlural <- "1 site was"} else {
+        fivetestsPlural <- paste(numberoffivetests,"sites were",sep=" ")
+      }
+
+  # How many times were volunteers unable to get data?
+    if (nrow(quarter[is.na(quarter$pH),]) == 1 ) { missingpH <- "1 time"} else{
+      missingpH <- paste(nrow(quarter[is.na(quarter$pH),])," times",sep=" ")
+    }
+    if (nrow(quarter[is.na(quarter$averageDo),]) == 1 ) {
+      missingdo <- "1 time"} else {
+      missingdo <- paste(nrow(quarter[is.na(quarter$averageDo),])," times"
+                         ,sep=" ")
+    }
+    if (nrow(quarter[is.na(quarter$OxSat),]) == 1 ) {
+      missingoxsat <- "1 time"} else{
+      missingoxsat <- paste(nrow(quarter[is.na(quarter$OxSat),])," times"
+                            ,sep=" ")
+    }
+    if (nrow(quarter[is.na(quarter$totalAlk),]) == 1 ) {
+      missingAlk <- "1 time"} else{
+      missingAlk <- paste(nrow(quarter[is.na(quarter$totalAlk),])," times"
+                          ,sep=" ")
+    }
+    if (nrow(quarter[is.na(quarter$totalHardness),]) == 1 ) {
+      missingHard <- "1 time"} else{
+      missingHard <- paste(nrow(quarter[is.na(quarter$totalHardness),])," times"
+                           ,sep=" ")
+    }
+    if (nrow(quarter[is.na(quarter$turbidityJTU),]) == 1 ) {
+      missingTurb <- "1 time"} else{
+      missingTurb <- paste(nrow(quarter[is.na(quarter$turbidityJTU),])," times"
+                           ,sep=" ")
+    }
+    if (nrow(quarter[is.na(quarter$avgEcoli),]) == 1 ) {
+      missingEcoli <- "1 time"} else{
+      missingEcoli <- paste(nrow(quarter[is.na(quarter$avgEcoli),])," times"
+                          ,sep=" ")
+    }
+
+  description <- str_wrap(str_glue("In this quarter, {onetestsPlural} tested
+                                   once, {twotestsPlural} tested twice,
+                                   {threetestsPlural} tested three times,
+                                   {fourtestsPlural} tested four times,
+                                   and {fivetestsPlural} tested five or more
+                                   times. Out of the {nrow(quarter)} tests this
+                                   quarter, data were missing for the following
+                                   measures: pH was missing {missingpH},
+                                   dissolved oxygen was missing {missingdo},
+                                   oxygen saturation was missing {missingoxsat},
+                                   alkalinity was missing {missingAlk},
+                                   hardness was missing {missingHard},
+                                   turbidity was missing {missingTurb}, and
+                                   E Coli was missing {missingEcoli}."),105)
+
+### Step 9. Graph
   dashboard <-
   db %>%
     ggplot(aes(x=0,y=y)) +
@@ -218,6 +298,9 @@ ytddata <- clean %>%
     scale_shape_manual(values = c(25,20,24)) +
     scale_color_manual(values=c(mid,mid2,main)) +
     scale_fill_manual(values=c(mid,mid2,main)) +
+    # Add some text/description
+    geom_text(aes(x=0,y=-3),label=description,family = ft
+              , color = dark,hjust=0) +
     theme_minimal()+
     theme(panel.grid = element_blank()
           ,axis.title = element_blank()
@@ -225,7 +308,7 @@ ytddata <- clean %>%
           ,legend.position = "none"
           ,plot.caption = element_text(family = ft,hjust=0,color=dark))
 
-## Step 9. Bring together
+## Step 10. Bring together
 pdf(file = paste(directory,"CarkeekWatershedTesting",quarterName,".pdf",sep="")
     ,paper="letter",width=8,height=11)
 
