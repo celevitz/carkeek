@@ -214,6 +214,7 @@ ytddata <- clean %>%
     geom_rect(aes(xmin=0,xmax=60,ymin=5.6,ymax=5.6),color=dark,fill=dark)+
     geom_point(aes(x=40,y=y,shape = directionofchange,color=directionofchange
                    ,fill = directionofchange),size=3) +
+    labs(caption = "For more details, please contact troy.beckner@gmail.com") +
     scale_shape_manual(values = c(25,20,24)) +
     scale_color_manual(values=c(mid,mid2,main)) +
     scale_fill_manual(values=c(mid,mid2,main)) +
@@ -221,7 +222,8 @@ ytddata <- clean %>%
     theme(panel.grid = element_blank()
           ,axis.title = element_blank()
           ,axis.text = element_blank()
-          ,legend.position = "none" )
+          ,legend.position = "none"
+          ,plot.caption = element_text(family = ft,hjust=0,color=dark))
 
 ## Step 8g. Bring together
 pdf(file = paste(directory,"CarkeekWatershedTesting",quarterName,".pdf",sep="")
