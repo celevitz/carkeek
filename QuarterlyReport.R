@@ -281,8 +281,10 @@ negativechangelabel <- paste0("-",pqNumberoftests-qNumberoftests)
   timestested <- graphFunction(str_glue("{qNumberoftests}")
                                ,str_glue("{pqNumberoftests}")
                                ,str_glue("tests")
-                            ,paste0("+",qNumberoftests-pqNumberoftests)
-                            ,paste0("-",pqNumberoftests-qNumberoftests))
+                            ,paste0("+",qNumberoftests-pqNumberoftests
+                                    ," since last quarter")
+                            ,paste0("-",pqNumberoftests-qNumberoftests
+                                    ," since last quarter"))
 
 ## Step 8d. Number of tests with two people
   testswith2graph <- graphFunction(
@@ -290,9 +292,11 @@ negativechangelabel <- paste0("-",pqNumberoftests-qNumberoftests)
     ,str_glue("{round(pqNumberoftestsinpairs/pqNumberoftests*100,1)}%")
     ,str_glue("done with\na partner")
     ,paste0("+",round((qNumberoftestsinpairs/qNumberoftests-
-                         pqNumberoftestsinpairs/pqNumberoftests)*100,1),"%")
+                         pqNumberoftestsinpairs/pqNumberoftests)*100,1),"%"
+            ," since last quarter")
     ,paste0("-",round((pqNumberoftestsinpairs/pqNumberoftests-
-                         qNumberoftestsinpairs/qNumberoftests)*100,1),"%")
+                         qNumberoftestsinpairs/qNumberoftests)*100,1),"%"
+            ," since last quarter")
   )
 
 ## Step 8e. Number of volunteers
@@ -300,8 +304,8 @@ negativechangelabel <- paste0("-",pqNumberoftests-qNumberoftests)
     str_glue("{qNumVols}")
     ,str_glue("{pqNumVols}")
     ,str_glue("unique\nvolunteers")
-    ,paste0("+",qNumVols-pqNumVols)
-    ,paste0("-",pqNumVols-qNumVols)
+    ,paste0("+",qNumVols-pqNumVols," since last quarter")
+    ,paste0("-",pqNumVols-qNumVols," since last quarter")
   )
 
 ## Step 8f. Number of hours by volunteers this quarters
@@ -309,8 +313,8 @@ negativechangelabel <- paste0("-",pqNumberoftests-qNumberoftests)
     str_glue("{qVolTime}")
     ,str_glue("{pqVolTime}")
     ,str_glue("hours")
-    ,paste0("+",qVolTime-pqVolTime)
-    ,paste0("-",pqVolTime-qVolTime)
+    ,paste0("+",qVolTime-pqVolTime," since last quarter")
+    ,paste0("-",pqVolTime-qVolTime," since last quarter")
   )
 
 ## Step 8g. Bring together
@@ -318,12 +322,13 @@ pdf(file = paste(directory,"CarkeekWatershedTesting",quarterName,".pdf",sep="")
     ,paper="letter",width=8,height=11)
 
 ggarrange(ggarrange(header,header2,ncol=2,nrow=2,widths=c(2,1))
-        ,tablecolumnnames
+        #,tablecolumnnames
         ,timestested
         ,testswith2graph
         ,numvolsgraph
         ,numHrsGraph
-        ,nrow=6,ncol=1
+        #,nrow=6,ncol=1
+        ,nrow=5,ncol=1
 )
 dev.off()
 
