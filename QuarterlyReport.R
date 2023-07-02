@@ -115,23 +115,42 @@ previousq <- clean %>%
 
 
 ## Step 5. year to date
+ytddata <- clean %>%
+  filter(yeartodate == "include")
 
+  # Testing information
+    # Number of tests
+    ytdNumberoftests <- nrow(ytddata)
 
+    # Number of tests with two people
+    ytdNumberoftestsinpairs <- nrow(ytddata[ytddata$numberofvolunteers==2,])
 
+    # Volunteer information
+    # Number of unique volunteers
+    ytdNumVols <- length(unique(unique(ytddata$tester1)
+                               ,unique(ytddata$tester2)))
+
+    # Number of volunteer hours
+    ytdVolTime <- sum(ytddata$numberofvolunteers)*2
+
+    # Number of times each of them volunteered
+    ytdAveragetimesvolunteered <- round(ytdNumberoftests/ytdNumVols,1)
 
 ## Step 6. Create dataframe of this information
   db <- as.data.frame(matrix(c(c("Tests",qNumberoftests,pqNumberoftests
-                                 ,NA,5)
+                                 ,ytdNumberoftests,5)
                          ,c("% of tests done in pairs",round(
                             qNumberoftestsinpairs/qNumberoftests*100,1)
                             ,round(pqNumberoftestsinpairs/pqNumberoftests*100,1)
-                            ,NA,4)
+                            ,round(ytdNumberoftestsinpairs/ytdNumberoftests*100
+                                   ,1)
+                            ,4)
                          ,c("Unique volunteers",qNumVols,pqNumVols
-                            ,NA,3)
-                         ,c("Hours",qVolTime,pqVolTime,NA,2)
+                            ,ytdNumVols,3)
+                         ,c("Volunteer hours",qVolTime,pqVolTime,ytdVolTime,2)
                          ,c("Average times volunteered"
                             ,qAveragetimesvolunteered,pqAveragetimesvolunteered
-                            ,NA,1))
+                            ,ytdAveragetimesvolunteered,1))
                        ,ncol=5,byrow = TRUE
                        ,dimnames=list(NULL
                                   ,c("measure","current","previous","ytd"
@@ -149,24 +168,47 @@ previousq <- clean %>%
   dashboard <-
   db %>%
     ggplot(aes(x=0,y=y)) +
-    geom_text(aes(x=0,y=y,label = measure),hjust=0,family = ft) +
-    geom_text(aes(x=10,y=y,label = current),hjust=0,family = ft) +
-    geom_text(aes(x=20,y=y,label = previous),hjust=0,family = ft) +
-    geom_text(aes(x=31,y=y,label = quarterlyChange),hjust=0,family = ft) +
-    geom_point(aes(x=30,y=y,shape = directionofchange,color=directionofchange
-                   ,fill = directionofchange)) +
+    geom_text(aes(x=0,y=y,label = measure),hjust=0,family = ft,color=dark) +
+    # numbers
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+                ,aes(x=20,y=y,label = current),hjust=0,family = ft,color=dark) +
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+                ,aes(x=30,y=y,label = previous),hjust=0,family = ft
+                ,color=dark) +
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+                ,aes(x=41,y=y,label = quarterlyChange),hjust=0,family = ft
+                ,color=dark) +
+      geom_text(data=db %>% filter(measure != "% of tests done in pairs")
+                ,aes(x=51,y=y,label = ytd),hjust=0,family = ft,color=dark) +
+    # percents
+      geom_text(data=db %>% filter(measure == "% of tests done in pairs")
+                ,aes(x=20,y=y,label = paste0(current,"%")),hjust=0
+                ,family = ft,color=dark) +
+      geom_text(data=db %>% filter(measure == "% of tests done in pairs")
+                ,aes(x=30,y=y,label = paste0(previous,"%")),hjust=0
+                ,family = ft,color=dark) +
+      geom_text(data=db %>% filter(measure == "% of tests done in pairs")
+                ,aes(x=41,y=y,label = paste0(quarterlyChange,"%")),hjust=0
+                ,family = ft,color=dark) +
+      geom_text(data=db %>% filter(measure == "% of tests done in pairs")
+                ,aes(x=51,y=y,label = paste0(ytd,"%")),hjust=0
+                ,family = ft,color=dark) +
+    # other graph stuff
+    geom_vline(xintercept = 46,color=dark) +
+    geom_point(aes(x=40,y=y,shape = directionofchange,color=directionofchange
+                   ,fill = directionofchange),size=3) +
     scale_shape_manual(values = c(25,20,24)) +
     scale_color_manual(values=c(mid,mid2,main)) +
     scale_fill_manual(values=c(mid,mid2,main)) +
-    scale_x_continuous(lim=c(0,60),breaks=seq(0,40,10)
+    scale_x_continuous(lim=c(0,60),breaks=c(0,20,30,40,50)
                        ,labels=c("Measure","Current quarter","Previous quarter"
-                                ,"Change since last quarter","Year-to-date")
+                                ,"Change since\nlast quarter","Year-to-date")
                        ,position = "top")+
     theme_minimal()+
     theme(panel.grid = element_blank()
           ,axis.title = element_blank()
           ,axis.text.y = element_blank()
-          ,axis.text.x = element_text(family = ft)
+          ,axis.text.x = element_text(family = ft,face = "bold",size=10)
           ,legend.position = "none" )
 
 
