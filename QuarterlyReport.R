@@ -165,7 +165,7 @@ ytddata <- clean %>%
                                          ,quarterlyChange == 0 ~ "no change"
                                          ,quarterlyChange > 0 ~ "positive"))
 
-### Step 7. Graph
+### Step 8. Graph
   dashboard <-
   db %>%
     ggplot(aes(x=0,y=y)) +
@@ -202,16 +202,16 @@ ytddata <- clean %>%
               ,family = ft, size = 4, color = dark,hjust=0) +
     coord_cartesian(clip = "off") +
     # then add the logo and title
-    scale_y_continuous(lim=c(0,10))+
+    scale_y_continuous(lim=c(-10,10))+
     geom_rect(aes(xmin=0,xmax=60,ymin=7,ymax=10),color = main,fill = main) +
-    geom_image(aes(x=30,y=9,image=logo),size=.5) +
+    geom_image(aes(x=30,y=9,image=logo),size=.2) +
     geom_text(aes(x=30,y=7.5),hjust=.5,size=8,color = "white",family = ft
               ,label=paste0("Quarterly report for ",quarterNameMid)) +
     # other graph stuff
     # instead of using geom_vline, I'm going to just make a line that only
     # is within the table
     geom_rect(aes(xmin=49,xmax=49,ymin=.8,ymax=6.2),color=dark,fill=dark)+
-    geom_rect(aes(xmin=0,xmax=60,ymin=5.6,ymax=5.6),color=dark,fill=dark)+
+    geom_rect(aes(xmin=0,xmax=60,ymin=5.5,ymax=5.5),color=dark,fill=dark)+
     geom_point(aes(x=40,y=y,shape = directionofchange,color=directionofchange
                    ,fill = directionofchange),size=3) +
     labs(caption = "For more details, please contact troy.beckner@gmail.com") +
@@ -225,7 +225,7 @@ ytddata <- clean %>%
           ,legend.position = "none"
           ,plot.caption = element_text(family = ft,hjust=0,color=dark))
 
-## Step 8g. Bring together
+## Step 9. Bring together
 pdf(file = paste(directory,"CarkeekWatershedTesting",quarterName,".pdf",sep="")
     ,paper="letter",width=8,height=11)
 
