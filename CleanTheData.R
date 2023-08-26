@@ -19,7 +19,9 @@ exportdataname  <- "H20Data"
 ## Step 2: Bring in data and clean it
 ### Step 2a. Bring in data
 rawdata <- as_tibble(read.xlsx(paste(directory,importdataname,".xlsx"
-                                     ,sep=""),sheet=1,startRow = 2))
+                                     ,sep=""),sheet=1,startRow = 2)) %>%
+  # drop the fake data
+  filter(`Tester.#1` != "John Doe")
 
 ### Step 2b. Clean data
 clean <- rawdata %>%
@@ -42,7 +44,8 @@ clean <- rawdata %>%
                                   ,`Tester.#2` %in% c("-  ","-") ~ NA
                                   ,TRUE ~ `Tester.#2`)
          # If Turbidity is greater than 240, plot it at 241
-         ,`Turbidity.(JTU)` = ifelse(">240 NCU","241",`Turbidity.(JTU)`)
+         ,`Turbidity.(JTU)` = case_when(`Turbidity.(JTU)` %in% ">240 NCU"~"241"
+                                        ,TRUE ~ trimws(`Turbidity.(JTU)`))
          # If Coliform is too numerous to count (TNTC), plot it at 350
          ,Coliform.1 = case_when(Coliform.1 %in% c("TNTC","TNTC ")~"350"
                                  ,Coliform.1 %in% c("-","n/a") ~NA
@@ -53,9 +56,7 @@ clean <- rawdata %>%
          ,Coliform.3 = case_when(Coliform.3 %in% c("TNTC","TNTC ")~"350"
                                  ,Coliform.3 %in% c("-","n/a") ~NA
                                  ,TRUE ~ Coliform.3)
-  ) %>%
-  # drop the fake data
-  filter(`Tester.#1` != "John Doe")
+  )
 
 # change characters variables that should be numeric, to numeric
 for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
