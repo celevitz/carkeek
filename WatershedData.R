@@ -68,7 +68,7 @@ overallsubtitle <- str_wrap(str_glue("If you are interested in volunteering,
                           have questions, or would like to donate, please email:
                           info (at) CarkeekWatershed.org"),80)
 overallcaption <- str_glue("Analyzed by Carly Levitz and supported by
-                         Troy Beckner")
+                         Troy Beckner & Haley Mateen")
 
 temptitle <- str_glue("Air temperature")
 tempsubtitle <- str_wrap(str_glue("Air temperature affects water temperature.
