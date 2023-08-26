@@ -3,6 +3,10 @@
 ## Updated: 2023-06-24
 ## Purpose: clean the data
 
+library(tidyr)
+library(openxlsx)
+library(tidyverse)
+
 ## Step 1: set things up
 rm(list=ls())
 
