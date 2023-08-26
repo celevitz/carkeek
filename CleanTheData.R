@@ -13,7 +13,7 @@ rm(list=ls())
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
 
-importdataname <- "H20 Data as of May 2024"
+importdataname <- "H20data_2023-08-26"
 exportdataname  <- "H20Data"
 
 ## Step 2: Bring in data and clean it
@@ -42,6 +42,7 @@ clean <- rawdata %>%
          ,`Tester.#2` = case_when(`Tester.#2` %in% c("Alice") ~
                                     "Alice Cottrell-Steen"
                                   ,`Tester.#2` %in% c("-  ","-") ~ NA
+                                  ,`Tester.#2` %in% c("racheal") ~ "Racheal"
                                   ,TRUE ~ `Tester.#2`)
          # If Turbidity is greater than 240, plot it at 241
          ,`Turbidity.(JTU)` = case_when(`Turbidity.(JTU)` %in% ">240 NCU"~"241"
@@ -66,17 +67,30 @@ for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
   clean[,charvar] <- as.numeric(unlist(clean[,charvar]))
 }
 
+## Data checks:
+  # Is there a site number?
+    clean[is.na(clean$`Site.#`),]
+
+  # Is there a tester?
+    clean[is.na(clean$`Tester.#1`),]
+
+  # is the date appropriate?
+    clean$year <- substr(clean$Date.Tested,1,4)
+    table(clean$year)
+
+## Create an ID for each test time
+clean <- clean %>%
+  mutate(siteDateId = paste0("site",`Site.#`,"_",Date.Tested))
+
 ## rename the data
 names(clean) <- c("siteNumber","tester1","tester2","dateTested","month"
-                  ,"timeTested","isThereASiteNumber","isThereATester"
-                  ,"isTheDateAppropriate","exclude","siteDateId","year"
-                  ,"previousYear","monthCalculated","previousMonth","watershed"
+                  ,"timeTested","watershed"
                   ,"waterbody","waterbodyCondition","weatherConditions"
                   ,"airTemp","waterTemp","pH","do1","do2","averageDo","OxSat"
                   ,"dropAlk","totalAlk","dropHardness","totalHardness"
                   ,"turbidityJTU","secchiDepth","ecoli1","ecoli2","ecoli3"
                   ,"avgEcoli","coliform1","coliform2","coliform3","avgColiform"
-                  ,"comments")
+                  ,"comments","year","siteDateId")
 
 ## Step 4. Export data
 write.csv(clean,paste0(directory,exportdataname,".csv"),row.names=FALSE)
