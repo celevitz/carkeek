@@ -89,7 +89,7 @@ quarter <- clean %>%
     qVolTime <- sum(quarter$numberofvolunteers)*2
 
     # Number of times each of them volunteered
-    qAveragetimesvolunteered <- qNumberoftests/qNumVols
+    qAveragetimesvolunteered <- round(qNumberoftests/qNumVols,1)
 
 ## Step 4. previous quarter
 previousq <- clean %>%
@@ -111,7 +111,7 @@ previousq <- clean %>%
     pqVolTime <- sum(previousq$numberofvolunteers)*2
 
     # Number of times each of them volunteered
-    pqAveragetimesvolunteered <- pqNumberoftests/pqNumVols
+    pqAveragetimesvolunteered <- round(pqNumberoftests/pqNumVols,1)
 
 
 ## Step 5. year to date
@@ -191,7 +191,7 @@ ytddata <- clean %>%
         fourtestsPlural <- paste(numberoffourtests,"sites were",sep=" ")
       }
     numberoffivetests <- nrow(numberoftestsbysite[numberoftestsbysite$n > 4,])
-      if (numberoffivetests == 1) { fourtestsPlural <- "1 site was"} else {
+      if (numberoffivetests == 1) { fivetestsPlural <- "1 site was"} else {
         fivetestsPlural <- paste(numberoffivetests,"sites were",sep=" ")
       }
 
