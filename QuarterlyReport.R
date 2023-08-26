@@ -15,7 +15,7 @@ rm(list=ls())
   quartermax <- "2023-06-30"
   previousquartermin <- "2023-01-01"
   previousquartermax <- "2023-03-31"
-  yeartodatemin <- "2022-07-01"
+  yeartodatemin <- "2023-01-01"
   yeartodatemax <- "2023-06-30"
   lastyearmin <- "2022-04-01"
   lastyearmax <- "2022-06-30"
