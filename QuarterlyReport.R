@@ -7,18 +7,18 @@
 rm(list=ls())
 
 # Change this each quarter
-  quarterName <- "2023Q2"
-  quarterNameMid <- "Q2 2023"
-  quarterNameLong <- "Q2 of 2023"
-  previousquarterMid <- "Q1 2023"
-  quartermin <- "2023-04-01"
-  quartermax <- "2023-06-30"
-  previousquartermin <- "2023-01-01"
-  previousquartermax <- "2023-03-31"
+  quarterName <- "2023Q3"
+  quarterNameMid <- "Q3 2023"
+  quarterNameLong <- "Q3 of 2023"
+  previousquarterMid <- "Q2 2023"
+  quartermin <- "2023-07-01"
+  quartermax <- "2023-09-30"
+  previousquartermin <- "2023-04-01"
+  previousquartermax <- "2023-06-30"
   yeartodatemin <- "2023-01-01"
-  yeartodatemax <- "2023-06-30"
-  lastyearmin <- "2022-04-01"
-  lastyearmax <- "2022-06-30"
+  yeartodatemax <- "2023-09-30"
+  lastyearmin <- "2022-07-01"
+  lastyearmax <- "2022-09-30"
 
 library(ggplot2)
 library(dplyr)
