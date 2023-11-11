@@ -2,6 +2,9 @@
 ## Written: 2023-09-17
 ## Updated: 2023-09-17
 ## Purpose: Compare Sites 6 and 7
+## Update 2023-11-11: Per email with Troy, this analysis is no longer needed.
+##   The report allowed them to conclude that we are good with the data coming
+##   from those sites as they relate to the whole.
 
 
 ## Step 1: set things up
