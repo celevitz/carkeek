@@ -42,6 +42,21 @@ data <- data2019 %>%
   bind_rows(data2023) %>%
   mutate(Year = substr(Survey.Date,1,4))
 
+## Data cleaning
+  # PREDATION: There are differences in how the 2023 data are categorized
+  # There's also a lot of missingness for this measure
+    data$Predation[data$Predation == "No damage"] <- "No"
+    data$Predation[data$Predation == "Predation"] <- "Yes"
+    data$Predation[data$Predation == "Eye loss only"] <- "Eye loss"
+
+  # Hours Since Death - categorize into Carcass Age
+
+  ## Data questions for Spencer and Troy
+    # Species: if it is blank, is it the same as if it's listed "unknown"?
+    # Sex: if it is blank, is it the same as if it's listed "unknown"?
+    # Predation: if it is blank, is it the same as if it's listed "unknown"?
+    # Hours since death: data were captured in hours in 2019 & 2020, but in categories in 2021 onwards. Can I recategorize the old data?
+
 write.csv(data,paste0(directory,"SalmonSurveyAllYears.csv"),row.names=FALSE)
 
 
