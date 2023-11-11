@@ -1,6 +1,6 @@
 ## Author: Carly Levitz
 ## Written: 2023-06-20
-## Updated: 2023-06-24
+## Updated: 2023-11-11
 ## Purpose: clean the data
 
 library(tidyr)
@@ -13,13 +13,13 @@ rm(list=ls())
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
 
-importdataname <- "H20data_2023-08-26"
+importdataname <- "H20data_2023-11-09"
 exportdataname  <- "H20Data"
 
 ## Step 2: Bring in data and clean it
 ### Step 2a. Bring in data
 rawdata <- as_tibble(read.xlsx(paste(directory,importdataname,".xlsx"
-                                     ,sep=""),sheet=1,startRow = 2)) %>%
+                                     ,sep=""),sheet=2,startRow = 2)) %>%
   # drop the fake data
   filter(`Tester.#1` != "John Doe")
 
@@ -77,6 +77,9 @@ for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
   # is the date appropriate?
     clean$year <- substr(clean$Date.Tested,1,4)
     table(clean$year)
+
+  # DELETE later - 2023-11-09 testing by Mary and Sylvie should be site 8
+    clean$`Site.#`[clean$`Tester.#1` == "Mary" & clean$Date.Tested == "2023-11-09"] <- 8
 
 ## Create an ID for each test time
 clean <- clean %>%
