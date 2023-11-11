@@ -39,7 +39,8 @@ data <- data2019 %>%
   bind_rows(data2021) %>%
   bind_rows(data2022) %>%
   mutate(Survey.Date = substr(created_at,1,10) ) %>%
-  bind_rows(data2023)
+  bind_rows(data2023) %>%
+  mutate(Year = substr(Survey.Date,1,4))
 
 write.csv(data,paste0(directory,"SalmonSurveyAllYears.csv"),row.names=FALSE)
 
