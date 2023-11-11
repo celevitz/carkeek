@@ -70,10 +70,9 @@ overallsubtitle <- str_wrap(str_glue("If you are interested in volunteering,
 overallcaption <- str_glue("Analyzed by Carly Levitz and supported by
                          Troy Beckner & Haley Mateen")
 
-temptitle <- str_glue("Air temperature")
+temptitle <- str_glue("Air temperature & weather")
 tempsubtitle <- str_wrap(str_glue("Air temperature affects water temperature.
-                                  (This graph will show other weather when
-                                  data on weather are captured.)"),65)
+                                  Weather data are shown at the bottom."),65)
 phtitle <- str_glue("pH levels")
 phsubtitle <- str_wrap(str_glue("pH measures how acidic or basic water is. A
                               value of 7 is neutral. Less than 7 is acidic,
@@ -113,7 +112,11 @@ sitepdf <- function(sitechosen) {
 # Step 3a. Create the data for just the specific site
   # and then write a little bit about the site
 sitespecificdata <- clean %>% filter(siteNumber == sitechosen) %>%
-  arrange(dateTested)
+  arrange(dateTested) %>%
+  mutate(image = case_when(weatherConditions == "Sunny" ~paste(directory,"sun.png",sep="")
+                           ,weatherConditions == "Rain (within 6 hours of testing)" ~paste(directory,"rain.png",sep="")
+                           ,weatherConditions == "Overcast" ~paste(directory,"cloud.jpeg",sep="")
+                           ) )
 
 volunteers <- sitespecificdata %>%
   select(tester1,tester2,dateTested) %>%
@@ -217,6 +220,7 @@ temperature <-
   ggplot(aes(x=dateTested,y=waterTemp)) +
   coord_cartesian(clip="off") +
   geom_point(aes(x=dateTested,y=airTemp),color=mid2) +
+  geom_image(aes(image=image,y=0), size=.05) +
   geom_line(aes(x=dateTested,y=airTemp),color=mid2) +
   geom_text(data = sitespecificdata %>% filter(dateTested == max(dateTested))
             ,aes(x=dateTested+1,y=airTemp,family=ft),color=mid2
