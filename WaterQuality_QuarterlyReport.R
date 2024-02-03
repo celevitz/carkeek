@@ -233,12 +233,7 @@ ytddata <- clean %>%
                           ,sep=" ")
     }
 
-  description <- str_wrap(str_glue("In this quarter, {onetestsPlural} tested
-                                   once, {twotestsPlural} tested twice,
-                                   {threetestsPlural} tested three times,
-                                   {fourtestsPlural} tested four times,
-                                   and {fivetestsPlural} tested five or more
-                                   times. Out of the {nrow(quarter)} tests this
+  description <- str_wrap(str_glue("Out of the {nrow(quarter)} tests this
                                    quarter, data were missing for the following
                                    measures: pH was missing {missingpH},
                                    dissolved oxygen was missing {missingdo},
@@ -247,6 +242,13 @@ ytddata <- clean %>%
                                    hardness was missing {missingHard},
                                    turbidity was missing {missingTurb}, and
                                    E Coli was missing {missingEcoli}."),105)
+  missingdata <- data.frame(measure = c("pH","Dissolved oxygen"
+                                        ,"Oxygen saturation","Alkalinity"
+                                        ,"Hardness","Turbidity","E Coli")
+                            ,value = c(missingpH,missingdo,missingoxsat
+                                       ,missingAlk,missingHard,missingTurb
+                                       ,missingEcoli))
+  missingdata$y <- as.numeric(row.names(missingdata))
 
   ## Add the description to the dataframe in case it makes it print more
   ## nicely than simple using geom_text
@@ -261,8 +263,6 @@ ytddata <- clean %>%
                                           ,"ytd","y"))))) %>%
       mutate(previous = as.numeric(previous)
              ,y = as.numeric(y))
-
-    db$directionofchange[is.na(db$directionofchange)] <- "no change"
 
 
 
@@ -333,7 +333,16 @@ ytddata <- clean %>%
               ,aes(x=0,y=-siteNumber-1,label=paste0("Site ",siteNumber))
               ,family = ft, size = 4, color = dark,hjust=0) +
     geom_text(aes(x=0,y=-1,family = ft, size = 4, color = dark,hjust=0
-                  ,label="Number of times each site was tested this quarter"))+
+                  ,label="Number of times each site was tested"))+
+    # Add information about when data were missing
+    geom_text(data=missingdata
+              ,aes(x=50,y=-y-2,label=value)
+              ,family = ft, size = 4, color = dark,hjust=0) +
+    geom_text(data=missingdata
+              ,aes(x=30,y=-y-2,label=measure)
+              ,family = ft, size = 4, color = dark,hjust=0) +
+    geom_text(aes(x=30,y=-2,family = ft, size = 4, color = dark,hjust=0
+                  ,label="Number of times data were missing by measure"))+
     # Theme
     theme_minimal()+
     theme(panel.grid = element_blank()
