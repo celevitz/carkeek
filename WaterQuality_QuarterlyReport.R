@@ -85,7 +85,8 @@ quarter <- clean %>%
 
   # Volunteer information
     # Number of unique volunteers
-    qNumVols <- length(unique(unique(quarter$tester1),unique(quarter$tester2)))
+    qNumVols <- length(unique(c(unique(quarter$tester1[!is.na(quarter$tester1)])
+                                ,unique(quarter$tester2[!is.na(quarter$tester2)]))))
 
     # Number of volunteer hours
     qVolTime <- sum(quarter$numberofvolunteers)*2
@@ -106,8 +107,8 @@ previousq <- clean %>%
 
   # Volunteer information
     # Number of unique volunteers
-    pqNumVols <- length(unique(unique(previousq$tester1)
-                               ,unique(previousq$tester2)))
+    pqNumVols <- length(unique(c(unique(previousq$tester1[!is.na(previousq$tester1)])
+                               ,unique(previousq$tester2[!is.na(previousq$tester2)]))))
 
     # Number of volunteer hours
     pqVolTime <- sum(previousq$numberofvolunteers)*2
@@ -129,8 +130,8 @@ ytddata <- clean %>%
 
     # Volunteer information
     # Number of unique volunteers
-    ytdNumVols <- length(unique(unique(ytddata$tester1)
-                               ,unique(ytddata$tester2)))
+    ytdNumVols <- length(unique(c(unique(ytddata$tester1[!is.na(ytddata$tester1)])
+                               ,unique(ytddata$tester2[!is.na(ytddata$tester2)]))))
 
     # Number of volunteer hours
     ytdVolTime <- sum(ytddata$numberofvolunteers)*2
