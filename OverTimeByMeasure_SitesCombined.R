@@ -86,7 +86,7 @@ quarterlyPeopleHours <- clean %>%
   mutate(numberoftesters = ifelse(is.na(tester2),1,2)
          ,peoplehours = numberoftesters*2)  %>%
   group_by(year,quarter) %>%
-  summarise(`Total volunteer hours (assuming two hours per test)` = sum(peoplehours))
+  summarise(`Total volunteer hours (assuming two hours per person per test)` = sum(peoplehours))
 
 quarterly <- quarterlyTests %>%
   left_join(quarterly2testers) %>%
@@ -183,6 +183,23 @@ ggplot(clean,aes(x=dateTested,y=OxSat,color=waterbody)) +
                               "#F0E442","#0072B2","#D55E00","#CC79A7")) +
   #theme
   ggtitle("Option 2: Oxygen Saturation") +
+  theme_minimal() +
+  theme(#panel.grid = element_blank()
+    #,axis.line = element_line(col="black")
+    #,axis.tick = element_line(col=dark)
+    #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+  )
+
+ggplot(clean,aes(x=dateTested,y=OxSat,color=waterbody,shape=siteNumber)) +
+  geom_point() +
+  facet_wrap(~waterbody) +
+  scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+  scale_y_continuous(lim=c(0,1.5)) +
+  scale_color_manual(values=c("#E69F00","#56B4E9","#009E73",
+                              "#F0E442","#0072B2","#D55E00","#CC79A7")) +
+  #theme
+  ggtitle("Option 3: Oxygen Saturation") +
   theme_minimal() +
   theme(#panel.grid = element_blank()
     #,axis.line = element_line(col="black")
