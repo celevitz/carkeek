@@ -13,7 +13,7 @@ rm(list=ls())
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
 
-importdataname <- "H20data_2023-11-09"
+importdataname <- "H20data_2024-02-02"
 exportdataname  <- "H20Data"
 
 ## Step 2: Bring in data and clean it
@@ -80,6 +80,7 @@ for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
 
   # DELETE later - 2023-11-09 testing by Mary and Sylvie should be site 8
     clean$`Site.#`[clean$`Tester.#1` == "Mary" & clean$Date.Tested == "2023-11-09"] <- 8
+    clean$`Site.#`[clean$`Tester.#1` == "Sean" & clean$Date.Tested == "2023-12-23"] <- 6
 
 ## Create an ID for each test time
 clean <- clean %>%
