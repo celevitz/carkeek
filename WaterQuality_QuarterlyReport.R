@@ -322,9 +322,9 @@ ytddata <- clean %>%
                ,aes(x=40,y=y,shape = directionofchange,color=directionofchange
                    ,fill = directionofchange),size=3) +
     labs(caption = "For more details, please contact troy.beckner@gmail.com") +
-    scale_shape_manual(values = c(25,20,24)) +
-    scale_color_manual(values=c(mid,mid2,main)) +
-    scale_fill_manual(values=c(mid,mid2,main)) +
+    scale_shape_manual(values = c("negative"=25,"no change"=20,"positive"=24)) +
+    scale_color_manual(values=c("negative"=mid,"no change"=mid2,"positive"=main)) +
+    scale_fill_manual(values=c("negative"=mid,"no change"=mid2,"positive"=main)) +
     # Add information about # of times each site was tested this quarter
     geom_text(data=numberoftestsbysite
               ,aes(x=10,y=-siteNumber-1,label=n)
