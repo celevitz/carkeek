@@ -54,8 +54,9 @@ clean <- read.csv(paste0(directory,"H20Data.csv"),stringsAsFactors = FALSE)
 
 var <- "OxSat"
 
-###############################################
+################################################################################
 ## Volunteer information over time: tests, unique volunteers, volunteer hours
+################################################################################
 
 quarterlyTests <- clean %>%
   group_by(year, quarter) %>%
@@ -72,30 +73,36 @@ quarterlyVols <- clean %>%
   mutate(n=n()) %>%
   distinct() %>%
   ungroup() %>% group_by(year,quarter) %>%
-  mutate(`Unique volunteers`=n()) %>%
-  select(year,quarter,`Unique volunteers`) %>%
+  mutate(`Number of unique volunteers`=n()) %>%
+  select(year,quarter,`Number of unique volunteers`) %>%
   distinct()
+
+quarterly2testers <- clean %>%
+  mutate(numberoftesters = ifelse(is.na(tester2),0,1) ) %>%
+  group_by(year,quarter) %>%
+  summarise(`Number of tests completed by a pair` = sum(numberoftesters))
 
 quarterlyPeopleHours <- clean %>%
   mutate(numberoftesters = ifelse(is.na(tester2),1,2)
          ,peoplehours = numberoftesters*2)  %>%
   group_by(year,quarter) %>%
-  summarise(`Volunteer hours` = sum(peoplehours))
+  summarise(`Total volunteer hours (assuming two hours per test)` = sum(peoplehours))
 
 quarterly <- quarterlyTests %>%
+  left_join(quarterly2testers) %>%
   left_join(quarterlyVols) %>%
   left_join(quarterlyPeopleHours) %>%
   mutate(time = paste0(as.character(year)," ",quarter)) %>%
   pivot_longer(!c(year,quarter,time),names_to="variable",values_to= "value")
 
-quarterlygraph <-
+quarterlyVolunteergraph <-
 
   quarterly %>%
   ggplot(aes(x=time,y=value)) +
   facet_wrap(~variable,ncol=1,scales="free_y")+
   geom_point(color=main) +
   geom_text(aes(label=value),nudge_y = 1,family = ft,color=main,size=smalltextsize) +
-  ggtitle("Carkeek Watershed Community Action Project:\nQuarterly Volunteer Summary") +
+  ggtitle("Carkeek Watershed Community Action Project:\nQuarterly Water Testing Volunteer Summary") +
   xlab("") + ylab("Quarterly value") +
   labs(caption = "Scales on y axes vary by graph") +
   theme_minimal() +
@@ -112,6 +119,40 @@ quarterlygraph <-
     )
 
 
+################################################################################
+## Site information
+################################################################################
+  # how many times was each site tested?
+  siteTests <- clean %>%
+    group_by(year,quarter,siteNumber) %>%
+    summarise(`Number of times this site was tested`=n()) %>%
+    mutate(time = paste0(as.character(year)," ",quarter)
+           ,label=paste0("Site ",siteNumber))
+
+    numberoftimessitesweretested <-
+      siteTests %>%
+      ggplot(aes(x=time,y=`Number of times this site was tested`)) +
+      facet_wrap(~label,ncol=2 )+
+      geom_point(color=main) +
+      #geom_text(aes(label=`Number of times this site was tested`)
+      #          ,nudge_y = 1,family = ft,color=main,size=smalltextsize) +
+      ggtitle("Number of tests done by site") +
+      xlab("") +
+      scale_y_continuous(lim=c(0,7)) +
+      theme_minimal() +
+      theme(
+        strip.background = element_rect(fill=light,color=light)
+        ,strip.text = element_text(family=ft,color=dark,size=subtitlesize)
+        ,title = element_text(family=ft,color=main,size=titlesize)
+        ,axis.title = element_text(family=ft,color=main,size=subtitlesize)
+        ,axis.text.y = element_text(family=ft,color=main,size=subtitlesize)
+        ,axis.text.x = element_text(family=ft,color=main,size=textsize)
+        ,plot.caption = element_text(family = ft,hjust=0
+                                     ,color=main,size=subtitlesize)
+        ,panel.grid = element_blank()
+        ,axis.line = element_line(color=dark)
+        ,axis.ticks = element_line(color=dark)
+      )
 
 
 
@@ -154,7 +195,8 @@ ggplot(clean,aes(x=dateTested,y=OxSat,color=waterbody)) +
 pdf(file = paste(directory,"CarkeekWatershedTesting_QuarterlyGraphs.pdf",sep="")
     ,paper="letter",width=8,height=11)
 
-quarterlygraph
+quarterlyVolunteergraph
+numberoftimessitesweretested
 
 dev.off()
 
