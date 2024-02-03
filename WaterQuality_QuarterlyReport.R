@@ -7,18 +7,18 @@
 rm(list=ls())
 
 # Change this each quarter
-  quarterName <- "2023Q3"
-  quarterNameMid <- "Q3 2023"
-  quarterNameLong <- "Q3 of 2023"
-  previousquarterMid <- "Q2 2023"
-  quartermin <- "2023-07-01"
-  quartermax <- "2023-09-30"
-  previousquartermin <- "2023-04-01"
-  previousquartermax <- "2023-06-30"
+  quarterName <- "2023Q4"
+  quarterNameMid <- "Q4 2023"
+  quarterNameLong <- "Q4 of 2023"
+  previousquarterMid <- "Q3 2023"
+  quartermin <- "2023-10-01"
+  quartermax <- "2023-12-31"
+  previousquartermin <- "2023-07-01"
+  previousquartermax <- "2023-09-30"
   yeartodatemin <- "2023-01-01"
-  yeartodatemax <- "2023-09-30"
-  lastyearmin <- "2022-07-01"
-  lastyearmax <- "2022-09-30"
+  yeartodatemax <- "2023-12-31"
+  lastyearmin <- "2022-01-01"
+  lastyearmax <- "2022-12-31"
 
 library(ggplot2)
 library(dplyr)
@@ -57,6 +57,8 @@ logo <- paste(directory,"CWCAPlogo-1-white-1024x346.png",sep="")
 clean <- read.csv(paste0(directory,"H20Data.csv"),stringsAsFactors = FALSE)
 
   clean <- clean %>%
+  # as-of 2/2/24, drop the 2024 data
+    filter(year != 2024) %>%
   # clean the date data
   mutate(dateTested = as.Date(dateTested)
   # Categorize the data into quarters
@@ -163,7 +165,8 @@ ytddata <- clean %>%
           ,quarterlyChange = current-previous
           ,directionofchange = case_when(quarterlyChange < 0 ~ "negative"
                                          ,quarterlyChange == 0 ~ "no change"
-                                         ,quarterlyChange > 0 ~ "positive"))
+                                         ,quarterlyChange > 0 ~ "positive"
+                                         ,is.na(quarterlyChange) ~ "no change") )
 
 ### Step 8. Write a description
   # How many times was each site tested?
@@ -259,6 +262,8 @@ ytddata <- clean %>%
       mutate(previous = as.numeric(previous)
              ,y = as.numeric(y))
 
+    db$directionofchange[is.na(db$directionofchange)] <- "no change"
+
 
 
 ### Step 9. Graph
@@ -313,15 +318,23 @@ ytddata <- clean %>%
     # is within the table
     geom_rect(aes(xmin=49,xmax=49,ymin=.8,ymax=6.2),color=dark,fill=dark)+
     geom_rect(aes(xmin=0,xmax=60,ymin=5.5,ymax=5.5),color=dark,fill=dark)+
-    geom_point(aes(x=40,y=y,shape = directionofchange,color=directionofchange
+    geom_point(data = db %>% filter(measure != "description")
+               ,aes(x=40,y=y,shape = directionofchange,color=directionofchange
                    ,fill = directionofchange),size=3) +
     labs(caption = "For more details, please contact troy.beckner@gmail.com") +
     scale_shape_manual(values = c(25,20,24)) +
     scale_color_manual(values=c(mid,mid2,main)) +
     scale_fill_manual(values=c(mid,mid2,main)) +
-    # Add some text/description
-    geom_text(data=db %>% filter(measure == "description")
-             ,aes(x=0,y=y,label = current),hjust=0,family = ft,color=dark) +
+    # Add information about # of times each site was tested this quarter
+    geom_text(data=numberoftestsbysite
+              ,aes(x=10,y=-siteNumber-1,label=n)
+              ,family = ft, size = 4, color = dark) +
+    geom_text(data=numberoftestsbysite
+              ,aes(x=0,y=-siteNumber-1,label=paste0("Site ",siteNumber))
+              ,family = ft, size = 4, color = dark,hjust=0) +
+    geom_text(aes(x=0,y=-1,family = ft, size = 4, color = dark,hjust=0
+                  ,label="Number of times each site was tested this quarter"))+
+    # Theme
     theme_minimal()+
     theme(panel.grid = element_blank()
           ,axis.title = element_blank()
