@@ -159,54 +159,217 @@ quarterlyVolunteergraph <-
 ################################################
 ## Measures with values
 
-ggplot(clean,aes(x=dateTested,y=OxSat,color=waterbody,shape=siteNumber)) +
-  geom_point() +
-  scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
-                                ,"5"=5,"6"=6,"7"=18,"8"=20)) +
-  scale_y_continuous(lim=c(0,1.5)) +
-  scale_color_manual(values=c("#E69F00","#56B4E9","#009E73",
-                              "#F0E442","#0072B2","#D55E00","#CC79A7")) +
-  #theme
-  ggtitle("Option 1: Oxygen Saturation") +
-  theme_minimal() +
-  theme(#panel.grid = element_blank()
-        #,axis.line = element_line(col="black")
-        #,axis.tick = element_line(col=dark)
-        #,plot.caption = element_text(family = ft,hjust=0,color=dark)
-    )
+    # remove waterbody na
+    nonawaterbody <- clean %>% filter(!(is.na(waterbody)))
 
-ggplot(clean,aes(x=dateTested,y=OxSat,color=waterbody)) +
-  geom_point() +
-  facet_wrap(~siteNumber) +
-  scale_y_continuous(lim=c(0,1.5)) +
-  scale_color_manual(values=c("#E69F00","#56B4E9","#009E73",
-                              "#F0E442","#0072B2","#D55E00","#CC79A7")) +
-  #theme
-  ggtitle("Option 2: Oxygen Saturation") +
-  theme_minimal() +
-  theme(#panel.grid = element_blank()
-    #,axis.line = element_line(col="black")
-    #,axis.tick = element_line(col=dark)
-    #,plot.caption = element_text(family = ft,hjust=0,color=dark)
-  )
+    # Ox Sat
+    oxsat <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=OxSat,color=siteNumber,shape=siteNumber)) +
+        geom_point() +
+        geom_line() +
+        facet_wrap(~waterbody) +
+        scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                      ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+        scale_y_continuous(lim=c(0.55,1.3)) +
+        scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                    ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+        #theme
+        ggtitle("Oxygen Saturation by Waterbody") +
+        xlab("Date tested") + ylab("Oxygen saturation") +
+        theme_minimal() +
+        guides(shape=guide_legend(title="Site")
+               ,color=guide_legend(title="Site")) +
+        theme(panel.grid = element_blank()
+              ,axis.text.x=element_text(family=ft,size=smalltextsize)
+              #,axis.line = element_line(col="black")
+              #,axis.tick = element_line(col=dark)
+              #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+          )
 
-ggplot(clean,aes(x=dateTested,y=OxSat,color=waterbody,shape=siteNumber)) +
-  geom_point() +
-  facet_wrap(~waterbody) +
-  scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
-                                ,"5"=5,"6"=6,"7"=18,"8"=20)) +
-  scale_y_continuous(lim=c(0,1.5)) +
-  scale_color_manual(values=c("#E69F00","#56B4E9","#009E73",
-                              "#F0E442","#0072B2","#D55E00","#CC79A7")) +
-  #theme
-  ggtitle("Option 3: Oxygen Saturation") +
-  theme_minimal() +
-  theme(#panel.grid = element_blank()
-    #,axis.line = element_line(col="black")
-    #,axis.tick = element_line(col=dark)
-    #,plot.caption = element_text(family = ft,hjust=0,color=dark)
-  )
+    # pH
+    pHgraph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=as.numeric(pH),color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(6.5,9)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("pH by Waterbody") +
+      xlab("Date tested") + ylab("pH") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
 
+    averagedograph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=averageDo,color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(6.5,15)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("Average Dissolved Oxygen (DO) by Waterbody") +
+      xlab("Date tested") + ylab("Average DO") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
+
+    alkalinitygraph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=totalAlk,color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(20,300)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("Alkalinity by Waterbody") +
+      xlab("Date tested") + ylab("Alkalinity") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
+
+    hardnessgraph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=totalHardness,color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(35,155)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("Hardness by Waterbody") +
+      xlab("Date tested") + ylab("Hardness") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
+
+    ecoligraph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=avgEcoli,color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(0,155)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("E Coli by Waterbody") +
+      xlab("Date tested") + ylab("Average E Coli") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
+
+    turbiditygraph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=turbidityJTU,color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(0,245)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("Turbidity by Waterbody") +
+      xlab("Date tested") + ylab("Turbidity JTU") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
+
+    airtempgraph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=airTemp,color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(-5,27)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("Air temperature by Waterbody") +
+      xlab("Date tested") + ylab("Air temperature (celsius)") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
+
+    watertempgraph <-
+      ggplot(nonawaterbody,aes(x=dateTested,y=waterTemp,color=siteNumber,shape=siteNumber)) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~waterbody) +
+      scale_shape_manual(values = c("1"=1,"2"=2,"3"=3,"4"=4
+                                    ,"5"=5,"6"=6,"7"=18,"8"=20)) +
+      scale_y_continuous(lim=c(-5,27)) +
+      scale_color_manual(values=c("#E69F00","#56B4E9","#009E73","gray74"
+                                  ,"#F0E442","#0072B2","#D55E00","#CC79A7")) +
+      #theme
+      ggtitle("Water temperature by Waterbody") +
+      xlab("Date tested") + ylab("Water temperature (celsius)") +
+      theme_minimal() +
+      guides(shape=guide_legend(title="Site")
+             ,color=guide_legend(title="Site")) +
+      theme(panel.grid = element_blank()
+            ,axis.text.x=element_text(family=ft,size=smalltextsize)
+            #,axis.line = element_line(col="black")
+            #,axis.tick = element_line(col=dark)
+            #,plot.caption = element_text(family = ft,hjust=0,color=dark)
+      )
 
 ###############################################################################
 pdf(file = paste(directory,"CarkeekWatershedTesting_QuarterlyGraphs.pdf",sep="")
@@ -214,6 +377,10 @@ pdf(file = paste(directory,"CarkeekWatershedTesting_QuarterlyGraphs.pdf",sep="")
 
 quarterlyVolunteergraph
 numberoftimessitesweretested
+
+ggarrange(oxsat,pHgraph,averagedograph,nrow=3,ncol=1)
+ggarrange(alkalinitygraph,hardnessgraph,ecoligraph,nrow=3,ncol=1)
+ggarrange(turbiditygraph,airtempgraph,watertempgraph,nrow=3,ncol=1)
 
 dev.off()
 

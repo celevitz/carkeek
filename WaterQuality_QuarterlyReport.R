@@ -7,18 +7,18 @@
 rm(list=ls())
 
 # Change this each quarter
-  quarterName <- "2023Q4"
-  quarterNameMid <- "Q4 2023"
-  quarterNameLong <- "Q4 of 2023"
-  previousquarterMid <- "Q3 2023"
-  quartermin <- "2023-10-01"
-  quartermax <- "2023-12-31"
-  previousquartermin <- "2023-07-01"
-  previousquartermax <- "2023-09-30"
-  yeartodatemin <- "2023-01-01"
-  yeartodatemax <- "2023-12-31"
-  lastyearmin <- "2022-01-01"
-  lastyearmax <- "2022-12-31"
+  quarterName <- "2024Q1"
+  quarterNameMid <- "Q1 2024"
+  quarterNameLong <- "Q1 of 2024"
+  previousquarterMid <- "Q4 2023"
+  quartermin <- "2024-01-01"
+  quartermax <- "2024-03-31"
+  previousquartermin <- "2023-10-01"
+  previousquartermax <- "2023-12-31"
+  yeartodatemin <- "2023-04-01"
+  yeartodatemax <- "2024-03-31"
+  lastyearmin <- "2022-04-01"
+  lastyearmax <- "2023-03-31"
 
 library(ggplot2)
 library(dplyr)
@@ -58,7 +58,7 @@ clean <- read.csv(paste0(directory,"H20Data.csv"),stringsAsFactors = FALSE)
 
   clean <- clean %>%
   # as-of 2/2/24, drop the 2024 data
-    filter(year != 2024) %>%
+  #  filter(year != 2024) %>%
   # clean the date data
   mutate(dateTested = as.Date(dateTested)
   # Categorize the data into quarters

@@ -13,7 +13,7 @@ rm(list=ls())
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
 
-importdataname <- "H20data_2024-02-02"
+importdataname <- "H20data_2024-03-13"
 exportdataname  <- "H20Data"
 
 ## Step 2: Bring in data and clean it
