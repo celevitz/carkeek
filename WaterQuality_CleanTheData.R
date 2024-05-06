@@ -34,7 +34,9 @@ clean <- rawdata %>%
          ,`Tester.#1` = trimws(gsub("\\\"","",`Tester.#1`),"both")
          ,`Tester.#2` = trimws(gsub("\\\"","",`Tester.#2`),"both")
          # combine testers that are the same
-         ,`Tester.#1` = case_when(`Tester.#1` %in% c("Sue") ~ "Sue Cottrell"
+         ,`Tester.#1` = case_when(`Tester.#1` %in% c("Alice") ~
+                                    "Alice Cottrell-Steen"
+                                  ,`Tester.#1` %in% c("Sue") ~ "Sue Cottrell"
                                   ,`Tester.#1` %in% c("Natale") ~ "Natalie"
                                   ,`Tester.#1` %in% c("mike") ~ "Mike"
                                   ,`Tester.#1` %in% c("sean") ~ "Sean"
@@ -43,7 +45,11 @@ clean <- rawdata %>%
                                     "Alice Cottrell-Steen"
                                   ,`Tester.#2` %in% c("-  ","-") ~ NA
                                   ,`Tester.#2` %in% c("racheal") ~ "Racheal"
+                                  ,`Tester.#2` %in% c("mike") ~ "Mike"
+                                  ,`Tester.#2` %in% c("Sue") ~ "Sue Cottrell"
                                   ,TRUE ~ `Tester.#2`)
+         # fix waterbody names
+         ,Waterbody = ifelse(Waterbody == "venema","Venema",Waterbody)
          # If Turbidity is greater than 240, plot it at 241
          ,`Turbidity.(JTU)` = case_when(`Turbidity.(JTU)` %in% ">240 NCU"~"241"
                                         ,TRUE ~ trimws(`Turbidity.(JTU)`))

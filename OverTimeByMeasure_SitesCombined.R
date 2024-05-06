@@ -64,6 +64,8 @@ quarterlyTests <- clean %>%
   select(year,quarter,`Number of tests`) %>%
   distinct()
 
+quarterlyTests %>% ungroup()  %>% summarise(average = mean(`Number of tests`))
+
 quarterlyVols <- clean %>%
   select(year,quarter,tester1,tester2) %>%
   pivot_longer(!c(year,quarter),names_to="tester") %>%
@@ -76,6 +78,20 @@ quarterlyVols <- clean %>%
   mutate(`Number of unique volunteers`=n()) %>%
   select(year,quarter,`Number of unique volunteers`) %>%
   distinct()
+
+clean %>%
+  select(year,quarter,tester1,tester2) %>%
+  pivot_longer(!c(year,quarter),names_to="tester") %>%
+  filter(!(is.na(value))) %>%
+  select(!tester) %>%
+  group_by(year,value) %>%
+  mutate(n=n()) %>%
+  distinct()  %>%
+  ungroup() %>% group_by(year) %>%
+  mutate(`Number of unique volunteers`=n()) %>%
+  select(year,`Number of unique volunteers`) %>%
+  distinct()
+
 
 quarterly2testers <- clean %>%
   mutate(numberoftesters = ifelse(is.na(tester2),0,1) ) %>%
