@@ -1,6 +1,6 @@
 ## Author: Carly Levitz
 ## Written: 2023-06-20
-## Updated: 2023-11-11
+## Updated: 2024-05-06
 ## Purpose: clean the data
 
 library(tidyr)
@@ -13,7 +13,7 @@ rm(list=ls())
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
 
-importdataname <- "H20data_2024-03-13"
+importdataname <- "H20data_2024-05-06"
 exportdataname  <- "H20Data"
 
 ## Step 2: Bring in data and clean it
