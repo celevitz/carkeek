@@ -81,8 +81,11 @@ for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
     clean[is.na(clean$`Tester.#1`),]
 
   # is the date appropriate?
-    clean$year <- substr(clean$Date.Tested,1,4)
-    table(clean$year)
+    clean$year2 <- substr(clean$Date.Tested,1,4)
+    table(clean$year2)
+    table(clean$Year==clean$year2)
+    clean$Year <- clean$year2
+    clean$year2 <- NULL
 
   # DELETE later - 2023-11-09 testing by Mary and Sylvie should be site 8
   # Commented out 10/27/24 after confirming the data got updated
@@ -101,8 +104,94 @@ names(clean) <- c("siteNumber","tester1","tester2","dateTested","month","year"
                   ,"dropAlk","totalAlk","dropHardness","totalHardness"
                   ,"turbidityJTU","secchiDepth","ecoli1","ecoli2","ecoli3"
                   ,"avgEcoli","coliform1","coliform2","coliform3","avgColiform"
-                  ,"publicInteractions","comments","year","siteDateId")
+                  ,"publicInteractions","comments","siteDateId")
 
 ## Step 4. Export data
 write.csv(clean,paste0(directory,exportdataname,".csv"),row.names=FALSE)
 
+
+# Create quarterly & annual dataset
+aggregated <- clean %>%
+  mutate(quarter = case_when(month %in% c(1,2,3) ~ "Q1"
+                              ,month %in% c(4,5,6) ~ "Q2"
+                              ,month %in% c(7,8,9) ~ "Q3"
+                              ,month %in% c(10,11,12) ~ "Q4"))
+
+  # Number of tests
+  numbertests <- aggregated %>%
+    group_by(year,quarter,month) %>%
+    summarise(Month = n()) %>%
+    left_join(
+      aggregated %>% group_by(year,quarter) %>%
+        summarise(Quarter = n())
+    ) %>%
+    left_join(
+      aggregated %>% group_by(year) %>%
+        summarise(Annual = n())
+    ) %>%
+    pivot_longer(!c(year,quarter,month),names_to="time",values_to="numberoftests")
+
+  # Number of volunteers
+  numberofuniquevolunteers <- aggregated %>%
+    select(year,tester1,tester2) %>%
+    pivot_longer(!c(year),names_to="tester") %>%
+    filter(!(is.na(value))) %>%
+    select(!tester) %>%
+    distinct() %>%
+    group_by(year) %>%
+    summarise(Annual = n()) %>%
+    # quarterly
+    left_join(aggregated %>%
+                select(year,quarter,tester1,tester2) %>%
+                pivot_longer(!c(year,quarter),names_to="tester") %>%
+                filter(!(is.na(value))) %>%
+                select(!tester) %>%
+                distinct() %>%
+                group_by(year,quarter) %>%
+                summarise(Quarter = n())) %>%
+    # monthly
+    right_join(aggregated %>%
+                select(year,quarter,month,tester1,tester2) %>%
+                pivot_longer(!c(year,month,quarter),names_to="tester") %>%
+                filter(!(is.na(value))) %>%
+                select(!tester) %>%
+                distinct() %>%
+                group_by(year,quarter,month) %>%
+                summarise(Month = n())) %>%
+    pivot_longer(!c(year,quarter,month),names_to="time",values_to="uniquevolunteers")
+
+  # Number completed by a pair
+  completedbypair <- aggregated %>%
+    mutate(numberoftesters = ifelse(is.na(tester2),0,1) ) %>%
+    group_by(year,quarter) %>%
+    summarise(Quarter = sum(numberoftesters)) %>%
+    ungroup() %>% group_by(year) %>%
+    mutate(Annual = sum(Quarter)) %>%
+    # monthly
+    right_join(aggregated %>%
+                 mutate(numberoftesters = ifelse(is.na(tester2),0,1) ) %>%
+                 group_by(year,quarter,month) %>%
+                 summarise(Month = sum(numberoftesters)) ) %>%
+    pivot_longer(!c(year,quarter,month),names_to="time",values_to="completedbypair")
+
+  PeopleHours <- aggregated %>%
+    mutate(numberoftesters = ifelse(is.na(tester2),1,2)
+           ,peoplehours = numberoftesters*2)  %>%
+    group_by(year,quarter) %>%
+    summarise(Quarter = sum(peoplehours)) %>%
+    ungroup() %>% group_by(year) %>%
+    mutate(Annual = sum(Quarter)) %>%
+    # monthly
+    right_join(aggregated %>%
+                 mutate(numberoftesters = ifelse(is.na(tester2),1,2)
+                        ,peoplehours = numberoftesters*2)  %>%
+                 group_by(year,quarter,month) %>%
+                 summarise(Month = sum(peoplehours))) %>%
+    pivot_longer(!c(year,quarter,month),names_to="time",values_to="peoplehours")
+
+aggregatedataset <- numbertests %>%
+  full_join(numberofuniquevolunteers) %>%
+  full_join(completedbypair) %>%
+  full_join(PeopleHours)
+
+write.csv(aggregatedataset,paste0(directory,exportdataname,"_aggregated.csv"),row.names=FALSE)
