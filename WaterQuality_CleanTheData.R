@@ -1,6 +1,6 @@
 ## Author: Carly Levitz
 ## Written: 2023-06-20
-## Updated: 2024-05-06
+## Updated: 2024-10-27
 ## Purpose: clean the data
 
 library(tidyr)
@@ -13,7 +13,7 @@ rm(list=ls())
 directory <- "/Users/carlylevitz/Documents/Data/carkeek/"
 setwd(directory)
 
-importdataname <- "H20data_2024-05-06"
+importdataname <- "H20data_2024-10-27"
 exportdataname  <- "H20Data"
 
 ## Step 2: Bring in data and clean it
@@ -34,7 +34,7 @@ clean <- rawdata %>%
          ,`Tester.#1` = trimws(gsub("\\\"","",`Tester.#1`),"both")
          ,`Tester.#2` = trimws(gsub("\\\"","",`Tester.#2`),"both")
          # combine testers that are the same
-         ,`Tester.#1` = case_when(`Tester.#1` %in% c("Alice") ~
+         ,`Tester.#1` = case_when(`Tester.#1` %in% c("Alice","ALice") ~
                                     "Alice Cottrell-Steen"
                                   ,`Tester.#1` %in% c("Sue") ~ "Sue Cottrell"
                                   ,`Tester.#1` %in% c("Natale") ~ "Natalie"
@@ -85,22 +85,23 @@ for (charvar in c("Average.DO","%.Ox..Sat.","Total.ALK","Total.Hardness"
     table(clean$year)
 
   # DELETE later - 2023-11-09 testing by Mary and Sylvie should be site 8
-    clean$`Site.#`[clean$`Tester.#1` == "Mary" & clean$Date.Tested == "2023-11-09"] <- 8
-    clean$`Site.#`[clean$`Tester.#1` == "Sean" & clean$Date.Tested == "2023-12-23"] <- 6
+  # Commented out 10/27/24 after confirming the data got updated
+    # clean$`Site.#`[clean$`Tester.#1` == "Mary" & clean$Date.Tested == "2023-11-09"] <- 8
+    # clean$`Site.#`[clean$`Tester.#1` == "Sean" & clean$Date.Tested == "2023-12-23"] <- 6
 
 ## Create an ID for each test time
 clean <- clean %>%
   mutate(siteDateId = paste0("site",`Site.#`,"_",Date.Tested))
 
-## rename the data
-names(clean) <- c("siteNumber","tester1","tester2","dateTested","month"
-                  ,"timeTested","watershed"
+## rename the variables
+names(clean) <- c("siteNumber","tester1","tester2","dateTested","month","year"
+                  ,"timeTested","volunteerHours","watershed"
                   ,"waterbody","waterbodyCondition","weatherConditions"
                   ,"airTemp","waterTemp","pH","do1","do2","averageDo","OxSat"
                   ,"dropAlk","totalAlk","dropHardness","totalHardness"
                   ,"turbidityJTU","secchiDepth","ecoli1","ecoli2","ecoli3"
                   ,"avgEcoli","coliform1","coliform2","coliform3","avgColiform"
-                  ,"comments","year","siteDateId")
+                  ,"publicInteractions","comments","year","siteDateId")
 
 ## Step 4. Export data
 write.csv(clean,paste0(directory,exportdataname,".csv"),row.names=FALSE)
