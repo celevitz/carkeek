@@ -183,6 +183,7 @@ aggregated <- clean %>%
     mutate(Annual = sum(Quarter)) %>%
     # monthly
     right_join(aggregated %>%
+                 select(tester1,tester2,year,quarter,month) %>%
                  mutate(numberoftesters = ifelse(is.na(tester2),1,2)
                         ,peoplehours = numberoftesters*2)  %>%
                  group_by(year,quarter,month) %>%
